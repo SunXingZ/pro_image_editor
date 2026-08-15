@@ -15,6 +15,7 @@ import 'image_generation_configs/image_generation_configs.dart';
 import 'layer_interaction_configs.dart';
 import 'main_editor_configs.dart';
 import 'paint_editor/paint_editor_configs.dart';
+import 'pixelsmix_editor_configs.dart';
 import 'progress_indicator_configs.dart';
 import 'state_history_configs.dart';
 import 'sticker_editor_configs.dart';
@@ -39,6 +40,7 @@ export 'image_generation_configs/image_generation_configs.dart';
 export 'layer_interaction_configs.dart';
 export 'main_editor_configs.dart';
 export 'paint_editor/paint_editor_configs.dart';
+export 'pixelsmix_editor_configs.dart';
 export 'progress_indicator_configs.dart';
 export 'state_history_configs.dart';
 export 'sticker_editor_configs.dart';
@@ -100,6 +102,7 @@ class ProImageEditorConfigs {
     this.blurEditor = const BlurEditorConfigs(),
     this.emojiEditor = const EmojiEditorConfigs(),
     this.stickerEditor = const StickerEditorConfigs(),
+    this.pixelsmixEditor = const PixelsmixEditorConfigs(),
     this.stateHistory = const StateHistoryConfigs(),
     this.imageGeneration = const ImageGenerationConfigs(),
     this.helperLines = const HelperLineConfigs(),
@@ -154,6 +157,9 @@ class ProImageEditorConfigs {
   /// Configuration options for the Sticker Editor.
   final StickerEditorConfigs stickerEditor;
 
+  /// Configuration options for the Pixelsmix Editor.
+  final PixelsmixEditorConfigs pixelsmixEditor;
+
   /// The design mode for the Image Editor.
   final ImageEditorDesignMode designMode;
 
@@ -197,6 +203,7 @@ class ProImageEditorConfigs {
     BlurEditorConfigs? blurEditor,
     EmojiEditorConfigs? emojiEditor,
     StickerEditorConfigs? stickerEditor,
+    PixelsmixEditorConfigs? pixelsmixEditor,
     ImageEditorDesignMode? designMode,
     DialogConfigs? dialogConfigs,
     ProgressIndicatorConfigs? progressIndicatorConfigs,
@@ -221,6 +228,7 @@ class ProImageEditorConfigs {
       blurEditor: blurEditor ?? this.blurEditor,
       emojiEditor: emojiEditor ?? this.emojiEditor,
       stickerEditor: stickerEditor ?? this.stickerEditor,
+      pixelsmixEditor: pixelsmixEditor ?? this.pixelsmixEditor,
       designMode: designMode ?? this.designMode,
       dialogConfigs: dialogConfigs ?? this.dialogConfigs,
       progressIndicatorConfigs:

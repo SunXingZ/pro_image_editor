@@ -37,6 +37,8 @@ class EditorMapper {
         return EditorMode.emoji;
       case StickerEditorConfigs():
         return EditorMode.sticker;
+      case PixelsmixEditorInitConfigs():
+        return EditorMode.pixelsmix;
       case MainEditorConfigs():
         return EditorMode.main;
       default:

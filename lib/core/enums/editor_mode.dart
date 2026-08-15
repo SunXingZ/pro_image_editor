@@ -26,6 +26,9 @@ enum EditorMode {
 
   /// The sticker editor.
   sticker,
+
+  /// The Pixelsmix shader editor.
+  pixelsmix,
 }
 
 /// Defines the available sub-editor modes.
@@ -59,4 +62,43 @@ enum SubEditorMode {
 
   /// The video-clips editor.
   videoClips,
+
+  /// The Pixelsmix tone-curve editor.
+  pixelsmixCurve,
+
+  /// The Pixelsmix HSL editor.
+  pixelsmixHsl,
+
+  /// The Pixelsmix color-balance editor.
+  pixelsmixColorBalance,
+
+  /// The Pixelsmix highlight/shadow-tint editor.
+  pixelsmixHighlightShadowTint,
+
+  /// The Pixelsmix vibrance editor.
+  pixelsmixVibrance,
+
+  /// The Pixelsmix haze editor.
+  pixelsmixHaze,
+
+  /// The Pixelsmix highlight/shadow editor.
+  pixelsmixHighlightShadow,
+
+  /// The Pixelsmix sharpen editor.
+  pixelsmixSharpen,
+
+  /// The Pixelsmix noise editor.
+  pixelsmixNoise,
+
+  /// The Pixelsmix vignette editor.
+  pixelsmixVignette,
+
+  /// The Pixelsmix color-matrix editor.
+  pixelsmixColorMatrix,
+
+  /// The Pixelsmix LUT editor.
+  pixelsmixLut,
+
+  /// The Pixelsmix blur editor (circular / linear blur).
+  pixelsmixBlur,
 }

@@ -5,6 +5,7 @@ import '/features/filter_editor/types/filter_state.dart';
 import '/features/filter_editor/widgets/filter_generator.dart';
 import '/shared/widgets/transform/transformed_content_generator.dart';
 import '../../filter_editor/widgets/filtered_widget.dart';
+import '../../pixelsmix_editor/widgets/shader_filtered_widget.dart';
 import '../services/sizes_manager.dart';
 import '../services/state_manager.dart';
 
@@ -64,17 +65,22 @@ class MainEditorBackgroundVideo extends StatelessWidget {
               isVideoPlayer: true,
               transformConfigs: stateManager.transformConfigs,
               configs: configs,
-              child: FilteredWidget(
-                filterKey: backgroundImageColorFilterKey,
-                width: sizesManager.decodedImageSize.width,
-                height: sizesManager.decodedImageSize.height,
-                configs: configs,
-                filters: stateManager.activeFilters.allMatrices,
-                tuneAdjustments: stateManager.activeTuneAdjustments,
-                blurFactor: stateManager.activeBlur,
-                videoPlayer: videoPlayer,
-                filterStates: stateManager.activeFilters,
+              child: ShaderFilteredWidget(
+                shaderFilters: stateManager.activeShaderFilters,
+                imageSize: sizesManager.decodedImageSize,
                 playTimeNotifier: playTimeNotifier,
+                child: FilteredWidget(
+                  filterKey: backgroundImageColorFilterKey,
+                  width: sizesManager.decodedImageSize.width,
+                  height: sizesManager.decodedImageSize.height,
+                  configs: configs,
+                  filters: stateManager.activeFilters.allMatrices,
+                  tuneAdjustments: stateManager.activeTuneAdjustments,
+                  blurFactor: stateManager.activeBlur,
+                  videoPlayer: videoPlayer,
+                  filterStates: stateManager.activeFilters,
+                  playTimeNotifier: playTimeNotifier,
+                ),
               ),
             ),
     );

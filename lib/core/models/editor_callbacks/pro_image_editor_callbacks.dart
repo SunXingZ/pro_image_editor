@@ -8,6 +8,7 @@ import 'emoji_editor_callbacks.dart';
 import 'filter_editor_callbacks.dart';
 import 'main_editor/main_editor_callbacks.dart';
 import 'paint_editor_callbacks.dart';
+import 'pixelsmix_editor_callbacks.dart';
 import 'sticker_editor_callbacks.dart';
 import 'text_editor_callbacks.dart';
 import 'tune_editor_callbacks.dart';
@@ -23,6 +24,7 @@ export 'emoji_editor_callbacks.dart';
 export 'filter_editor_callbacks.dart';
 export 'main_editor/main_editor_callbacks.dart';
 export 'paint_editor_callbacks.dart';
+export 'pixelsmix_editor_callbacks.dart';
 export 'sticker_editor_callbacks.dart';
 export 'text_editor_callbacks.dart';
 export 'tune_editor_callbacks.dart';
@@ -46,6 +48,7 @@ class ProImageEditorCallbacks {
     this.emojiEditorCallbacks,
     this.stickerEditorCallbacks,
     this.tuneEditorCallbacks,
+    this.pixelsmixEditorCallbacks,
     this.videoEditorCallbacks,
     this.audioEditorCallbacks,
     this.clipsEditorCallbacks,
@@ -132,6 +135,9 @@ class ProImageEditorCallbacks {
   /// Callbacks from the tune editor.
   final TuneEditorCallbacks? tuneEditorCallbacks;
 
+  /// Callbacks from the Pixelsmix editor.
+  final PixelsmixEditorCallbacks? pixelsmixEditorCallbacks;
+
   /// Callbacks from the video editor.
   final VideoEditorCallbacks? videoEditorCallbacks;
 
@@ -157,6 +163,7 @@ class ProImageEditorCallbacks {
     EmojiEditorCallbacks? emojiEditorCallbacks,
     StickerEditorCallbacks? stickerEditorCallbacks,
     TuneEditorCallbacks? tuneEditorCallbacks,
+    PixelsmixEditorCallbacks? pixelsmixEditorCallbacks,
     VideoEditorCallbacks? videoEditorCallbacks,
     AudioEditorCallbacks? audioEditorCallbacks,
     ClipsEditorCallbacks? clipsEditorCallbacks,
@@ -182,6 +189,8 @@ class ProImageEditorCallbacks {
       stickerEditorCallbacks:
           stickerEditorCallbacks ?? this.stickerEditorCallbacks,
       tuneEditorCallbacks: tuneEditorCallbacks ?? this.tuneEditorCallbacks,
+      pixelsmixEditorCallbacks:
+          pixelsmixEditorCallbacks ?? this.pixelsmixEditorCallbacks,
       videoEditorCallbacks: videoEditorCallbacks ?? this.videoEditorCallbacks,
       audioEditorCallbacks: audioEditorCallbacks ?? this.audioEditorCallbacks,
       clipsEditorCallbacks: clipsEditorCallbacks ?? this.clipsEditorCallbacks,

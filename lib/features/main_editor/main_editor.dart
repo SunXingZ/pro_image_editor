@@ -759,6 +759,7 @@ class ProImageEditorState extends State<ProImageEditor>
     TransformConfigs? transformConfigs,
     List<FilterState>? filters,
     List<TuneAdjustmentMatrix>? tuneAdjustments,
+    List<ShaderFilterState>? shaderFilters,
     double? blur,
     Map<String, dynamic>? meta,
     bool heroScreenshotRequired = false,
@@ -770,6 +771,10 @@ class ProImageEditorState extends State<ProImageEditor>
         .toList();
     final resolvedTuneAdjustments =
         (tuneAdjustments ?? stateManager.activeTuneAdjustments)
+            .map((item) => item.copy())
+            .toList();
+    final resolvedShaderFilters =
+        (shaderFilters ?? stateManager.activeShaderFilters)
             .map((item) => item.copy())
             .toList();
     final resolvedMeta = _deepCopyMeta(meta ?? stateManager.activeMeta);
@@ -785,6 +790,7 @@ class ProImageEditorState extends State<ProImageEditor>
                 : activeLayerList),
         filters: resolvedFilters,
         tuneAdjustments: resolvedTuneAdjustments,
+        shaderFilters: resolvedShaderFilters,
         meta: resolvedMeta,
       ),
       historyLimit: stateHistoryConfigs.stateHistoryLimit,
@@ -2284,6 +2290,71 @@ class ProImageEditorState extends State<ProImageEditor>
     mainEditorCallbacks?.handleUpdateUI();
   }
 
+  /// Opens the Pixelsmix editor for the given [tool].
+  ///
+  /// 打开指定 Pixelsmix 工具的独立编辑页。若产生了效果，则将其加入历史，
+  /// 从而支持撤销/重做；取消或无效果时保持当前状态不变。
+  void openPixelsmixEditor(ShaderTool tool) async {
+    if (!mounted) return;
+    List<ShaderFilterState>? shaderFilters = await openPage(
+      HeroMode(
+        enabled: true,
+        child: PixelsmixEditor.autoSource(
+          key: pixelsmixEditor,
+          editorImage: widget.blankSize == null
+              ? editorImage
+              : EditorImage(byteArray: kImageEditorTransparentBytes),
+          videoController: _videoController,
+          initConfigs: PixelsmixEditorInitConfigs(
+            theme: _theme,
+            configs: configs,
+            callbacks: callbacks,
+            transformConfigs: stateManager.transformConfigs,
+            layers: _layerCopyManager.copyLayerList(activeLayers),
+            mainImageSize: widget.blankSize ?? sizesManager.decodedImageSize,
+            mainBodySize: sizesManager.bodySize,
+            convertToUint8List: false,
+            appliedBlurFactor: stateManager.activeBlur,
+            appliedFilters: stateManager.activeFilters.allMatrices,
+            appliedTuneAdjustments: stateManager.activeTuneAdjustments,
+            tool: tool,
+            appliedShaderFilters: stateManager.activeShaderFilters,
+          ),
+        ),
+      ),
+    );
+
+    if (shaderFilters == null) return;
+
+    // 重编辑同一工具（模糊的圆形/线性视为同一工具）时，在原位置替换
+    // 旧状态，保持效果叠加顺序不变；不同工具之间正常叠加。
+    final merged =
+        stateManager.activeShaderFilters.map((e) => e.copy()).toList();
+    for (final inc in shaderFilters) {
+      final isBlur = inc.tool == ShaderTool.selectiveBlur ||
+          inc.tool == ShaderTool.tiltShiftBlur;
+      bool matches(ShaderFilterState e) => isBlur
+          ? (e.tool == ShaderTool.selectiveBlur ||
+              e.tool == ShaderTool.tiltShiftBlur)
+          : e.tool == inc.tool;
+      final index = merged.indexWhere(matches);
+      merged.removeWhere(matches);
+      if (index >= 0) {
+        merged.insert(index > merged.length ? merged.length : index, inc);
+      } else {
+        merged.add(inc);
+      }
+    }
+
+    addHistory(
+      shaderFilters: merged,
+      heroScreenshotRequired: true,
+    );
+
+    setState(() {});
+    mainEditorCallbacks?.handleUpdateUI();
+  }
+
   /// Opens the emoji editor.
   ///
   /// This method opens the emoji editor as a modal bottom sheet, allowing the
@@ -3482,6 +3553,7 @@ class ProImageEditorState extends State<ProImageEditor>
             openStickerEditor: openStickerEditor,
             openAudioEditor: openAudioEditor,
             openClipsEditor: openClipsEditor,
+            openPixelsmixEditor: openPixelsmixEditor,
           );
   }
 

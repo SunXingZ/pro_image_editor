@@ -21,6 +21,7 @@ class EditorFactory {
     EditorMode.emoji: const EmojiEditorCallbacks(),
     EditorMode.sticker: const StickerEditorCallbacks(),
     EditorMode.text: const TextEditorCallbacks(),
+    EditorMode.pixelsmix: const PixelsmixEditorCallbacks(),
     EditorMode.main: const MainEditorCallbacks(),
   };
 

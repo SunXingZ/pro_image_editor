@@ -7,6 +7,7 @@ import 'i18n_emoji_editor.dart';
 import 'i18n_filter_editor.dart';
 import 'i18n_layer_interaction.dart';
 import 'i18n_paint_editor.dart';
+import 'i18n_pixelsmix_editor.dart';
 import 'i18n_sticker_editor.dart';
 import 'i18n_text_editor.dart';
 import 'i18n_tune_editor.dart';
@@ -20,6 +21,7 @@ export 'i18n_emoji_editor.dart';
 export 'i18n_filter_editor.dart';
 export 'i18n_layer_interaction.dart';
 export 'i18n_paint_editor.dart';
+export 'i18n_pixelsmix_editor.dart';
 export 'i18n_sticker_editor.dart';
 export 'i18n_text_editor.dart';
 export 'i18n_tune_editor.dart';
@@ -154,6 +156,7 @@ class I18n {
     this.blurEditor = const I18nBlurEditor(),
     this.emojiEditor = const I18nEmojiEditor(),
     this.stickerEditor = const I18nStickerEditor(),
+    this.pixelsmixEditor = const I18nPixelsmixEditor(),
     this.audioEditor = const I18nAudioEditor(),
     this.clipsEditor = const I18nClipsEditor(),
     this.various = const I18nVarious(),
@@ -192,6 +195,9 @@ class I18n {
 
   /// Translations and messages specific to the sticker editor.
   final I18nStickerEditor stickerEditor;
+
+  /// Translations and messages specific to the Pixelsmix editor.
+  final I18nPixelsmixEditor pixelsmixEditor;
 
   /// Translations and messages specific to the crop and rotate editor.
   final I18nCropRotateEditor cropRotateEditor;
@@ -240,6 +246,7 @@ class I18n {
     I18nBlurEditor? blurEditor,
     I18nEmojiEditor? emojiEditor,
     I18nStickerEditor? stickerEditor,
+    I18nPixelsmixEditor? pixelsmixEditor,
     I18nCropRotateEditor? cropRotateEditor,
     I18nAudioEditor? audioEditor,
     I18nClipsEditor? clipsEditor,
@@ -261,6 +268,7 @@ class I18n {
       blurEditor: blurEditor ?? this.blurEditor,
       emojiEditor: emojiEditor ?? this.emojiEditor,
       stickerEditor: stickerEditor ?? this.stickerEditor,
+      pixelsmixEditor: pixelsmixEditor ?? this.pixelsmixEditor,
       cropRotateEditor: cropRotateEditor ?? this.cropRotateEditor,
       audioEditor: audioEditor ?? this.audioEditor,
       clipsEditor: clipsEditor ?? this.clipsEditor,

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
+import '/features/pixelsmix_editor/models/shader_filter_state.dart';
 import '/shared/widgets/editor_scrollbar.dart';
 import '/shared/widgets/flat_icon_text_button.dart';
 import '../controllers/main_editor_controllers.dart';
@@ -45,6 +46,7 @@ class MainEditorBottombar extends StatelessWidget {
     required this.openStickerEditor,
     required this.openAudioEditor,
     required this.openClipsEditor,
+    required this.openPixelsmixEditor,
   });
 
   /// Manages the main editor's controllers.
@@ -92,6 +94,9 @@ class MainEditorBottombar extends StatelessWidget {
   /// Callback for opening the clips editor.
   final Function() openClipsEditor;
 
+  /// Callback for opening a specific Pixelsmix shader editor.
+  final Function(ShaderTool tool) openPixelsmixEditor;
+
   final double _bottomIconSize = 22.0;
   Color get _foregroundColor => configs.mainEditor.style.bottomBarColor;
   TextStyle get _bottomTextStyle =>
@@ -123,7 +128,6 @@ class MainEditorBottombar extends StatelessWidget {
                               : constraints.maxWidth,
                           700,
                         ),
-                        maxWidth: 700,
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -226,10 +230,101 @@ class MainEditorBottombar extends StatelessWidget {
                 icon: configs.clipsEditor.icons.bottomNavBar,
                 onPressed: openClipsEditor,
               );
+
+            case SubEditorMode.pixelsmixCurve:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-curve-btn'),
+                tool: ShaderTool.toneCurve,
+              );
+
+            case SubEditorMode.pixelsmixHsl:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-hsl-btn'),
+                tool: ShaderTool.hslMix,
+              );
+
+            case SubEditorMode.pixelsmixColorBalance:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-color-balance-btn'),
+                tool: ShaderTool.colorBalance,
+              );
+
+            case SubEditorMode.pixelsmixHighlightShadowTint:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-tint-btn'),
+                tool: ShaderTool.highlightShadowTint,
+              );
+
+            case SubEditorMode.pixelsmixVibrance:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-vibrance-btn'),
+                tool: ShaderTool.vibrance,
+              );
+
+            case SubEditorMode.pixelsmixHaze:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-haze-btn'),
+                tool: ShaderTool.haze,
+              );
+
+            case SubEditorMode.pixelsmixHighlightShadow:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-highlight-shadow-btn'),
+                tool: ShaderTool.highlightShadow,
+              );
+
+            case SubEditorMode.pixelsmixSharpen:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-sharpen-btn'),
+                tool: ShaderTool.sharpen,
+              );
+
+            case SubEditorMode.pixelsmixNoise:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-noise-btn'),
+                tool: ShaderTool.noise,
+              );
+
+            case SubEditorMode.pixelsmixVignette:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-vignette-btn'),
+                tool: ShaderTool.vignette,
+              );
+
+            case SubEditorMode.pixelsmixColorMatrix:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-color-matrix-btn'),
+                tool: ShaderTool.colorMatrix,
+              );
+
+            case SubEditorMode.pixelsmixLut:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-lut-btn'),
+                tool: ShaderTool.lut,
+              );
+
+            case SubEditorMode.pixelsmixBlur:
+              return _buildPixelsmixButton(
+                key: const ValueKey('open-pixelsmix-blur-btn'),
+                tool: ShaderTool.selectiveBlur,
+              );
           }
         })
         .whereType<Widget>()
         .toList();
+  }
+
+  /// Helper to build a Pixelsmix tool entry button.
+  Widget _buildPixelsmixButton({
+    required ValueKey<String> key,
+    required ShaderTool tool,
+  }) {
+    return _buildActionButton(
+      key: key,
+      label: configs.i18n.pixelsmixEditor.toolLabels[tool] ?? '',
+      icon: configs.pixelsmixEditor.icons.tools[tool] ?? Icons.auto_fix_high,
+      onPressed: () => openPixelsmixEditor(tool),
+    );
   }
 
   /// Helper to build a single action button

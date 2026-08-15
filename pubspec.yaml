@@ -43,6 +43,13 @@ dependencies:
   shared_preferences: ^2.5.4
   vector_math: ^2.2.0
   web: ^1.1.1
+  # 供 pixelsmix 离屏渲染管线使用（与 pixelsmix_filters 传递依赖同版本）
+  flutter_image_filters: ^0.0.28
+  # Pixelsmix 自定义滤镜包（git 依赖，锁定 master 分支）
+  pixelsmix_filters:
+    git:
+      url: https://github.com/SunXingZ/pixelsmix_filters.git
+      ref: master
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +80,20 @@ flutter:
       platforms: [web]
   shaders:
     - lib/shared/shaders/pixelate.frag
+    - lib/shared/shaders/pixelsmix/tone_curve.frag
+    - lib/shared/shaders/pixelsmix/hsl_mix.frag
+    - lib/shared/shaders/pixelsmix/color_balance.frag
+    - lib/shared/shaders/pixelsmix/highlight_shadow_tint.frag
+    - lib/shared/shaders/pixelsmix/vibrance.frag
+    - lib/shared/shaders/pixelsmix/haze.frag
+    - lib/shared/shaders/pixelsmix/highlight_shadow.frag
+    - lib/shared/shaders/pixelsmix/sharpen.frag
+    - lib/shared/shaders/pixelsmix/noise.frag
+    - lib/shared/shaders/pixelsmix/vignette.frag
+    - lib/shared/shaders/pixelsmix/color_matrix.frag
+    - lib/shared/shaders/pixelsmix/lut.frag
+    - lib/shared/shaders/pixelsmix/selective_blur.frag
+    - lib/shared/shaders/pixelsmix/tilt_shift_blur.frag
   fonts:
    - family: ProImageEditorIcons
      fonts:

@@ -7,6 +7,7 @@ import '/features/crop_rotate_editor/crop_rotate_editor.dart';
 import '/features/emoji_editor/emoji_editor.dart';
 import '/features/filter_editor/filter_editor.dart';
 import '/features/paint_editor/paint_editor.dart';
+import '/features/pixelsmix_editor/pixelsmix_editor.dart';
 import '/features/text_editor/text_editor.dart';
 import '/features/tune_editor/tune_editor.dart';
 
@@ -35,6 +36,10 @@ mixin MainEditorGlobalKeys {
   /// A GlobalKey for the Blur Editor, used to access and control the state of
   /// the blur editor.
   final blurEditor = GlobalKey<BlurEditorState>();
+
+  /// A GlobalKey for the Pixelsmix Editor, used to access and control the
+  /// state of the Pixelsmix editor.
+  final pixelsmixEditor = GlobalKey<PixelsmixEditorState>();
 
   /// A GlobalKey for the Emoji Editor, used to access and control the state of
   /// the emoji editor.

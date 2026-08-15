@@ -11,6 +11,7 @@ import '/core/models/history/state_history.dart';
 import '/core/models/layers/layer.dart';
 import '/core/platform/io/io_helper.dart';
 import '/features/filter_editor/types/filter_state.dart';
+import '/features/pixelsmix_editor/models/shader_filter_state.dart';
 import '/features/tune_editor/models/tune_adjustment_matrix.dart';
 import '/shared/extensions/export_string_extension.dart';
 import '/shared/extensions/num_extension.dart';
@@ -134,6 +135,7 @@ class ExportStateHistory {
     EditorStateHistory accumulateHistory(int position) {
       List<FilterState> filters = [];
       List<TuneAdjustmentMatrix> tuneAdjustments = [];
+      List<ShaderFilterState> shaderFilters = [];
       double? blur;
       TransformConfigs? transformConfigs;
       Map<String, dynamic> meta = const {};
@@ -143,6 +145,9 @@ class ExportStateHistory {
         if (item.blur != null) blur = item.blur;
         if (item.tuneAdjustments.isNotEmpty) {
           tuneAdjustments = item.tuneAdjustments;
+        }
+        if (item.shaderFilters.isNotEmpty) {
+          shaderFilters = item.shaderFilters;
         }
         if (item.transformConfigs != null) {
           transformConfigs = item.transformConfigs;
@@ -156,6 +161,7 @@ class ExportStateHistory {
         layers: position <= 0 ? [] : changes[position - 1].layers,
         transformConfigs: transformConfigs,
         tuneAdjustments: tuneAdjustments,
+        shaderFilters: shaderFilters,
         meta: meta,
       );
     }
@@ -208,6 +214,8 @@ class ExportStateHistory {
 
       bool enableTuneExport =
           _configs.exportTuneAdjustments && element.tuneAdjustments.isNotEmpty;
+      bool enableShaderExport =
+          _configs.exportShaderFilters && element.shaderFilters.isNotEmpty;
       bool enableBlurExport = _configs.exportBlur && element.blur != null;
       bool enableFilterExport =
           _configs.exportFilter && element.filters.isNotEmpty;
@@ -224,6 +232,10 @@ class ExportStateHistory {
           'tune'.toHistoryKey(minifier): element.tuneAdjustments
               .where((item) => item.value != 0.0)
               .map((item) => item.toMap(maxDecimalPlaces: maxDecimalPlaces))
+              .toList(),
+        if (enableShaderExport)
+          'shader'.toHistoryKey(minifier): element.shaderFilters
+              .map((s) => s.toMap())
               .toList(),
         if (enableBlurExport) 'blur'.toHistoryKey(minifier): element.blur,
         if (enableCropRotateExport)

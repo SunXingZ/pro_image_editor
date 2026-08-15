@@ -3,6 +3,7 @@ import '/core/models/history/state_history.dart';
 import '/core/models/layers/layer.dart';
 import '/core/models/multi_threading/thread_capture_model.dart';
 import '/features/filter_editor/types/filter_state.dart';
+import '/features/pixelsmix_editor/models/shader_filter_state.dart';
 import '/features/tune_editor/models/tune_adjustment_matrix.dart';
 import '../../crop_rotate_editor/models/transform_configs.dart';
 
@@ -110,6 +111,8 @@ class StateManager {
 
     activeTuneAdjustments = _stateHistory[historyPointer].tuneAdjustments;
 
+    activeShaderFilters = _stateHistory[historyPointer].shaderFilters;
+
     activeLayers = _stateHistory[historyPointer].layers;
 
     activeMeta = _stateHistory[historyPointer].meta;
@@ -149,6 +152,9 @@ class StateManager {
   /// Each element in the list is of type `TuneAdjustmentMatrix`, representing
   /// specific adjustment settings.
   List<TuneAdjustmentMatrix> activeTuneAdjustments = [];
+
+  /// The active Pixelsmix shader filters for the image.
+  List<ShaderFilterState> activeShaderFilters = const [];
 
   /// The current transformation configurations applied to the image,
   /// including rotation, scaling, or other transformations.

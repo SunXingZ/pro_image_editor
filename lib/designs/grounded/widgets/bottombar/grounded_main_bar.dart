@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '/core/mixins/converted_configs.dart';
 import '/core/mixins/editor_configs_mixin.dart';
 import '/designs/grounded/grounded_design.dart';
+import '/features/pixelsmix_editor/utils/sub_editor_mapper.dart';
 import '/pro_image_editor.dart';
 import '/shared/widgets/editor_scrollbar.dart';
 
@@ -265,7 +266,35 @@ class GroundedMainBarState extends State<GroundedMainBar>
           icon: clipsEditorConfigs.icons.bottomNavBar,
           onPressed: widget.editor.openClipsEditor,
         );
+
+      case SubEditorMode.pixelsmixCurve ||
+          SubEditorMode.pixelsmixHsl ||
+          SubEditorMode.pixelsmixColorBalance ||
+          SubEditorMode.pixelsmixHighlightShadowTint ||
+          SubEditorMode.pixelsmixVibrance ||
+          SubEditorMode.pixelsmixHaze ||
+          SubEditorMode.pixelsmixHighlightShadow ||
+          SubEditorMode.pixelsmixSharpen ||
+          SubEditorMode.pixelsmixNoise ||
+          SubEditorMode.pixelsmixVignette ||
+          SubEditorMode.pixelsmixColorMatrix ||
+          SubEditorMode.pixelsmixLut ||
+          SubEditorMode.pixelsmixBlur:
+        return _buildPixelsmixButton(tool);
     }
+  }
+
+  /// 构建 Pixelsmix 工具的底部入口按钮。
+  Widget _buildPixelsmixButton(SubEditorMode mode) {
+    final tool = shaderToolOf(mode);
+    if (tool == null) return const SizedBox.shrink();
+    return _createToolButton(
+      label: i18n.pixelsmixEditor.toolLabels[tool] ?? '',
+      icon:
+          widget.editor.configs.pixelsmixEditor.icons.tools[tool] ??
+          Icons.auto_fix_high,
+      onPressed: () => widget.editor.openPixelsmixEditor(tool),
+    );
   }
 
   List<Widget> _buildToolList() {

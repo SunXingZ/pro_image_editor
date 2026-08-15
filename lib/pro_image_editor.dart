@@ -35,6 +35,7 @@ export 'core/models/init_configs/blur_editor_init_configs.dart';
 export 'core/models/init_configs/crop_rotate_editor_init_configs.dart';
 export 'core/models/init_configs/filter_editor_init_configs.dart';
 export 'core/models/init_configs/tune_editor_init_configs.dart';
+export 'core/models/init_configs/pixelsmix_editor_init_configs.dart';
 
 /// Various
 export '/core/models/complete_parameters.dart';
@@ -48,6 +49,7 @@ export 'features/crop_rotate_editor/crop_rotate_editor.dart';
 export 'features/emoji_editor/emoji_editor.dart';
 export 'features/filter_editor/filter_editor.dart';
 export 'features/tune_editor/tune_editor.dart';
+export 'features/pixelsmix_editor/pixelsmix_editor.dart';
 export '/shared/utils/debounce.dart';
 export '/features/main_editor/services/state_manager.dart';
 export '/features/tune_editor/models/tune_adjustment_matrix.dart';

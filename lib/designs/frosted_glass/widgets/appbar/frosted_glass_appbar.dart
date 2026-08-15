@@ -1,6 +1,7 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
 
+import '/features/pixelsmix_editor/utils/sub_editor_mapper.dart';
 import '/pro_image_editor.dart';
 import '../../frosted_glass.dart';
 import '../frosted_glass_effect.dart';
@@ -291,9 +292,39 @@ class _FrostedGlassActionBarState extends State<FrostedGlassActionBar> {
                 onPressed: widget.editor.openClipsEditor,
                 icon: Icon(widget.editor.clipsEditorConfigs.icons.bottomNavBar),
               );
+
+            case SubEditorMode.pixelsmixCurve ||
+                SubEditorMode.pixelsmixHsl ||
+                SubEditorMode.pixelsmixColorBalance ||
+                SubEditorMode.pixelsmixHighlightShadowTint ||
+                SubEditorMode.pixelsmixVibrance ||
+                SubEditorMode.pixelsmixHaze ||
+                SubEditorMode.pixelsmixHighlightShadow ||
+                SubEditorMode.pixelsmixSharpen ||
+                SubEditorMode.pixelsmixNoise ||
+                SubEditorMode.pixelsmixVignette ||
+                SubEditorMode.pixelsmixColorMatrix ||
+                SubEditorMode.pixelsmixLut ||
+                SubEditorMode.pixelsmixBlur:
+              return _buildPixelsmixButton(tool);
           }
         })
         .whereType<Widget>()
         .toList();
+  }
+
+  /// 构建 Pixelsmix 工具的顶部入口按钮。
+  Widget? _buildPixelsmixButton(SubEditorMode mode) {
+    final tool = shaderToolOf(mode);
+    if (tool == null) return null;
+    return IconButton(
+      tooltip:
+          widget.editor.configs.i18n.pixelsmixEditor.toolLabels[tool] ?? '',
+      onPressed: () => widget.editor.openPixelsmixEditor(tool),
+      icon: Icon(
+        widget.editor.configs.pixelsmixEditor.icons.tools[tool] ??
+            Icons.auto_fix_high,
+      ),
+    );
   }
 }

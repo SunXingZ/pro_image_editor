@@ -18,6 +18,7 @@ const Map<String, String> kMinifiedHistoryKeys = {
   'layers': 'l',
   'filters': 'f',
   'tune': 'a',
+  'shader': 's',
   'blur': 'b',
   'transform': 't',
   'meta': 'm',

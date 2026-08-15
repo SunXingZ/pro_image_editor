@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 
 import '/features/crop_rotate_editor/models/transform_configs.dart';
 import '/features/filter_editor/types/filter_state.dart';
+import '/features/pixelsmix_editor/models/shader_filter_state.dart';
 import '/features/tune_editor/models/tune_adjustment_matrix.dart';
 import '../layers/layer.dart';
 
@@ -19,6 +20,7 @@ class EditorStateHistory {
     this.layers = const [],
     this.filters = const [],
     this.tuneAdjustments = const [],
+    this.shaderFilters = const [],
     this.transformConfigs,
     this.meta = const {},
   });
@@ -34,6 +36,9 @@ class EditorStateHistory {
 
   /// The applied tune adjustments.
   final List<TuneAdjustmentMatrix> tuneAdjustments;
+
+  /// The applied Pixelsmix shader filters.
+  final List<ShaderFilterState> shaderFilters;
 
   /// The transformation from the crop/ rotate editor.
   TransformConfigs? transformConfigs;
@@ -53,6 +58,7 @@ class EditorStateHistory {
     List<Layer>? layers,
     List<FilterState>? filters,
     List<TuneAdjustmentMatrix>? tuneAdjustments,
+    List<ShaderFilterState>? shaderFilters,
     TransformConfigs? transformConfigs,
     Map<String, dynamic>? meta,
   }) {
@@ -61,6 +67,7 @@ class EditorStateHistory {
       layers: layers ?? this.layers,
       filters: filters ?? this.filters,
       tuneAdjustments: tuneAdjustments ?? this.tuneAdjustments,
+      shaderFilters: shaderFilters ?? this.shaderFilters,
       transformConfigs: transformConfigs ?? this.transformConfigs,
       meta: meta ?? this.meta,
     );
@@ -75,6 +82,7 @@ class EditorStateHistory {
         listEquals(other.layers, layers) &&
         listEquals(other.filters, filters) &&
         listEquals(other.tuneAdjustments, tuneAdjustments) &&
+        listEquals(other.shaderFilters, shaderFilters) &&
         transformConfigs == other.transformConfigs &&
         mapEquals(other.meta, meta);
   }
@@ -85,6 +93,7 @@ class EditorStateHistory {
         layers.hashCode ^
         filters.hashCode ^
         tuneAdjustments.hashCode ^
+        shaderFilters.hashCode ^
         transformConfigs.hashCode ^
         meta.hashCode;
   }

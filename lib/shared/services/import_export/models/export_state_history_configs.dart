@@ -15,6 +15,7 @@ class ExportEditorConfigs {
     this.exportCropRotate = true,
     this.exportFilter = true,
     this.exportTuneAdjustments = true,
+    this.exportShaderFilters = true,
     this.exportEmoji = true,
     this.exportBlur = true,
     this.exportWidgets = true,
@@ -69,6 +70,11 @@ class ExportEditorConfigs {
   ///
   /// Defaults to `true`.
   final bool exportTuneAdjustments;
+
+  /// Whether to export the applied Pixelsmix shader filters.
+  ///
+  /// Defaults to `true`.
+  final bool exportShaderFilters;
 
   /// Whether to export the emojis.
   ///

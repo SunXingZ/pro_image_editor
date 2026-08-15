@@ -13,6 +13,7 @@ import '/features/crop_rotate_editor/models/transform_configs.dart';
 import '/features/filter_editor/constants/identity_matrix_constant.dart';
 import '/features/filter_editor/types/filter_state.dart';
 import '/features/filter_editor/utils/lerp_color_matrix_utils.dart';
+import '/features/pixelsmix_editor/models/shader_filter_state.dart';
 import '/features/tune_editor/models/tune_adjustment_matrix.dart';
 import '../../utils/parser/double_parser.dart';
 import '../../utils/parser/int_parser.dart';
@@ -63,6 +64,7 @@ class ImportStateHistory {
 
     final blurKey = minifier.convertHistoryKey('blur');
     final tuneKey = minifier.convertHistoryKey('tune');
+    final shaderKey = minifier.convertHistoryKey('shader');
     final filtersKey = minifier.convertHistoryKey('filters');
     final transformKey = minifier.convertHistoryKey('transform');
     final metaKey = minifier.convertHistoryKey('meta');
@@ -159,6 +161,15 @@ class ImportStateHistory {
           .map((tune) => TuneAdjustmentMatrix.fromMap(tune))
           .toList();
 
+      /// Pixelsmix Shader Filters
+      final shaderFilters = (historyItem[shaderKey] as List<dynamic>? ?? [])
+          .map(
+            (s) => ShaderFilterState.fromMap(
+              Map<String, dynamic>.from(s as Map),
+            ),
+          )
+          .toList();
+
       /// Transformations
       final transformConfigs =
           historyItem[transformKey] != null &&
@@ -179,6 +190,7 @@ class ImportStateHistory {
           layers: layers,
           filters: filters,
           tuneAdjustments: tuneAdjustments,
+          shaderFilters: shaderFilters,
           transformConfigs: transformConfigs,
           meta: meta,
         ),
