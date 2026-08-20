@@ -59,15 +59,13 @@ class PixelsmixEditorBottombar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textColor = configs.style.bottomBarInactiveItemColor;
-    return SafeArea(
-      child: Container(
-        color: configs.style.bottomBarBackground,
-        padding: const EdgeInsets.only(top: 5),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 340),
-          child: SingleChildScrollView(
-            child: _buildToolView(textColor),
-          ),
+    return Container(
+      color: configs.style.bottomBarBackground,
+      padding: const EdgeInsets.only(top: 5),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 340),
+        child: SingleChildScrollView(
+          child: _buildToolView(textColor),
         ),
       ),
     );

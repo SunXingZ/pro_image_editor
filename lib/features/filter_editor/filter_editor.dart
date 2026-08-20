@@ -422,79 +422,77 @@ class FilterEditorState extends State<FilterEditor>
       );
     }
 
-    return SafeArea(
-      child: Container(
-        color: filterEditorConfigs.style.background,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 800),
-              child: RepaintBoundary(
-                child: StreamBuilder(
-                  stream: _uiFilterStream.stream,
-                  builder: (context, snapshot) {
-                    return SizedBox(
-                      height: 40,
-                      child: selectedFilter == PresetFilters.none
-                          ? null
-                          : filterEditorConfigs.widgets.slider?.call(
-                                  this,
-                                  rebuildController.stream,
-                                  filterOpacity,
-                                  _onChanged,
-                                  _onChangedEnd,
-                                ) ??
-                                Slider(
-                                  min: 0,
-                                  max: 1,
-                                  divisions: 100,
-                                  value: filterOpacity,
-                                  onChanged: _onChanged,
-                                  onChangeEnd: _onChangedEnd,
-                                ),
-                    );
-                  },
-                ),
+    return Container(
+      color: filterEditorConfigs.style.background,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: RepaintBoundary(
+              child: StreamBuilder(
+                stream: _uiFilterStream.stream,
+                builder: (context, snapshot) {
+                  return SizedBox(
+                    height: 40,
+                    child: selectedFilter == PresetFilters.none
+                        ? null
+                        : filterEditorConfigs.widgets.slider?.call(
+                                this,
+                                rebuildController.stream,
+                                filterOpacity,
+                                _onChanged,
+                                _onChangedEnd,
+                              ) ??
+                              Slider(
+                                min: 0,
+                                max: 1,
+                                divisions: 100,
+                                value: filterOpacity,
+                                onChanged: _onChanged,
+                                onChangeEnd: _onChangedEnd,
+                              ),
+                  );
+                },
               ),
             ),
-            StatefulBuilder(
-              builder: (context, setStateFilterList) {
-                return FilterEditorItemList(
-                  mainBodySize: getValidSizeOrDefault(
-                    mainBodySize,
-                    editorBodySize,
-                  ),
-                  mainImageSize: getValidSizeOrDefault(
-                    mainImageSize,
-                    editorBodySize,
-                  ),
-                  editorImage: editorImage,
-                  image: editorImage != null
-                      ? null
-                      : widget.videoController!.thumbnails?.isNotEmpty == true
-                      ? Image(image: widget.videoController!.thumbnails!.first)
-                      : Image.memory(kImageEditorTransparentBytes),
-                  activeFilters: filterEditorConfigs.enableMultiSelection
-                      ? appliedFilters
-                      : null,
-                  blurFactor: appliedBlurFactor,
-                  configs: configs,
-                  transformConfigs: initialTransformConfigs,
-                  selectedFilter: selectedFilter.filters,
-                  onSelectFilter: (filter) {
-                    setFilter(filter);
-                    setStateFilterList(() {});
-                    filterEditorCallbacks?.handleFilterChanged(filter);
-                    WidgetsBinding.instance.addPostFrameCallback((_) async {
-                      takeScreenshot();
-                    });
-                  },
-                );
-              },
-            ),
-          ],
-        ),
+          ),
+          StatefulBuilder(
+            builder: (context, setStateFilterList) {
+              return FilterEditorItemList(
+                mainBodySize: getValidSizeOrDefault(
+                  mainBodySize,
+                  editorBodySize,
+                ),
+                mainImageSize: getValidSizeOrDefault(
+                  mainImageSize,
+                  editorBodySize,
+                ),
+                editorImage: editorImage,
+                image: editorImage != null
+                    ? null
+                    : widget.videoController!.thumbnails?.isNotEmpty == true
+                    ? Image(image: widget.videoController!.thumbnails!.first)
+                    : Image.memory(kImageEditorTransparentBytes),
+                activeFilters: filterEditorConfigs.enableMultiSelection
+                    ? appliedFilters
+                    : null,
+                blurFactor: appliedBlurFactor,
+                configs: configs,
+                transformConfigs: initialTransformConfigs,
+                selectedFilter: selectedFilter.filters,
+                onSelectFilter: (filter) {
+                  setFilter(filter);
+                  setStateFilterList(() {});
+                  filterEditorCallbacks?.handleFilterChanged(filter);
+                  WidgetsBinding.instance.addPostFrameCallback((_) async {
+                    takeScreenshot();
+                  });
+                },
+              );
+            },
+          ),
+        ],
       ),
     );
   }

@@ -56,35 +56,33 @@ class BlurEditorBottombar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        color: blurEditorConfigs.style.background,
-        height: 100,
-        child: Align(
-          alignment: Alignment.center,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: RepaintBoundary(
-              child: ValueListenableBuilder(
-                valueListenable: blurFactor,
-                builder: (_, value, _) {
-                  return blurEditorConfigs.widgets.slider?.call(
-                        blurEditorState,
-                        rebuildController.stream,
-                        value,
-                        onChanged,
-                        onChangedEnd,
-                      ) ??
-                      Slider(
-                        min: 0,
-                        max: blurEditorConfigs.maxBlur,
-                        divisions: 100,
-                        value: value,
-                        onChanged: onChanged,
-                        onChangeEnd: onChangedEnd,
-                      );
-                },
-              ),
+    return Container(
+      color: blurEditorConfigs.style.background,
+      height: 100,
+      child: Align(
+        alignment: Alignment.center,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: RepaintBoundary(
+            child: ValueListenableBuilder(
+              valueListenable: blurFactor,
+              builder: (_, value, _) {
+                return blurEditorConfigs.widgets.slider?.call(
+                      blurEditorState,
+                      rebuildController.stream,
+                      value,
+                      onChanged,
+                      onChangedEnd,
+                    ) ??
+                    Slider(
+                      min: 0,
+                      max: blurEditorConfigs.maxBlur,
+                      divisions: 100,
+                      value: value,
+                      onChanged: onChanged,
+                      onChangeEnd: onChangedEnd,
+                    );
+              },
             ),
           ),
         ),

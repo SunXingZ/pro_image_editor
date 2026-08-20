@@ -96,16 +96,14 @@ class _TuneEditorBottombarState extends State<TuneEditorBottombar> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        color: widget.tuneEditorConfigs.style.bottomBarBackground,
-        padding: const EdgeInsets.only(top: 5),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 4,
-          children: [_buildSlider(), _buildItems()],
-        ),
+    return Container(
+      color: widget.tuneEditorConfigs.style.bottomBarBackground,
+      padding: const EdgeInsets.only(top: 5),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 4,
+        children: [_buildSlider(), _buildItems()],
       ),
     );
   }
