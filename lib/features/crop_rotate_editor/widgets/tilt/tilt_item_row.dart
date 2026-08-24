@@ -28,7 +28,7 @@ class TiltItemRow extends StatelessWidget {
     final i18n = provider.i18n;
     final icons = cropRotateConfigs.icons;
     final foregroundColor = cropRotateConfigs.style.bottomBarColor;
-    final defaultTextStyle = TextStyle(fontSize: 10.0, color: foregroundColor);
+    final defaultTextStyle = TextStyle(fontSize: 11.0, color: foregroundColor);
 
     Color buttonColor(TiltMode mode) {
       return mode == tiltMode
@@ -41,7 +41,7 @@ class TiltItemRow extends StatelessWidget {
           children: <Widget>[
             FlatIconTextButton(
               label: Text(i18n.back, style: defaultTextStyle),
-              icon: Icon(icons.backButton, color: foregroundColor),
+              icon: Icon(icons.backButton, size: 24, color: foregroundColor),
               onPressed: () => provider.setTiltEditorState(false),
             ),
             _buildDivider(),
@@ -55,6 +55,7 @@ class TiltItemRow extends StatelessWidget {
                 ),
                 icon: Icon(
                   icons.tiltRotate,
+                  size: 24,
                   color: buttonColor(TiltMode.rotate),
                 ),
                 onPressed: () => provider.setTiltMode(TiltMode.rotate),
@@ -69,6 +70,7 @@ class TiltItemRow extends StatelessWidget {
                 ),
                 icon: Icon(
                   icons.tiltHorizontal,
+                  size: 24,
                   color: buttonColor(TiltMode.horizontal),
                 ),
                 onPressed: () => provider.setTiltMode(TiltMode.horizontal),
@@ -83,6 +85,7 @@ class TiltItemRow extends StatelessWidget {
                 ),
                 icon: Icon(
                   icons.tiltVertical,
+                  size: 24,
                   color: buttonColor(TiltMode.vertical),
                 ),
                 onPressed: () => provider.setTiltMode(TiltMode.vertical),
@@ -90,7 +93,7 @@ class TiltItemRow extends StatelessWidget {
             _buildDivider(),
             FlatIconTextButton(
               label: Text(i18n.reset, style: defaultTextStyle),
-              icon: Icon(icons.reset, color: foregroundColor),
+              icon: Icon(icons.reset, size: 24, color: foregroundColor),
               onPressed: provider.reset,
             ),
           ],

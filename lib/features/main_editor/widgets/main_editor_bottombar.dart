@@ -97,10 +97,10 @@ class MainEditorBottombar extends StatelessWidget {
   /// Callback for opening a specific Pixelsmix shader editor.
   final Function(ShaderTool tool) openPixelsmixEditor;
 
-  final double _bottomIconSize = 22.0;
+  final double _bottomIconSize = 24.0;
   Color get _foregroundColor => configs.mainEditor.style.bottomBarColor;
   TextStyle get _bottomTextStyle =>
-      TextStyle(fontSize: 10.0, color: _foregroundColor);
+      TextStyle(fontSize: 11.0, color: _foregroundColor);
 
   @override
   Widget build(BuildContext context) {

@@ -65,7 +65,7 @@ class EmojiEditorBottomBar extends StatelessWidget {
         padding: const EdgeInsets.all(6.0),
         child: Icon(
           getIconForCategory(config.categoryViewConfig.categoryIcons, category),
-          size: 20,
+          size: 24,
         ),
       ),
     );

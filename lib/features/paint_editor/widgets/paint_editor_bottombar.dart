@@ -99,9 +99,9 @@ class PaintEditorBottombar extends StatelessWidget {
                     return FlatIconTextButton(
                       label: Text(
                         item.label,
-                        style: TextStyle(fontSize: 10.0, color: color),
+                        style: TextStyle(fontSize: 11.0, color: color),
                       ),
-                      icon: Icon(item.icon, color: color),
+                      icon: Icon(item.icon, size: 24, color: color),
                       onPressed: () {
                         setMode(item.mode);
                       },

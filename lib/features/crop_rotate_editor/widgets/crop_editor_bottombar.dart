@@ -151,9 +151,9 @@ class CropEditorBottombar extends StatelessWidget {
       key: item.key,
       label: Text(
         item.label,
-        style: TextStyle(fontSize: 10.0, color: foregroundColor),
+        style: TextStyle(fontSize: 11.0, color: foregroundColor),
       ),
-      icon: Icon(item.icon, color: foregroundColor),
+      icon: Icon(item.icon, size: 24, color: foregroundColor),
       onPressed: item.onTap,
     );
   }

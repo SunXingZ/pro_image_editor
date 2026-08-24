@@ -79,9 +79,9 @@ class TuneEditorBottombar extends StatefulWidget {
 }
 
 class _TuneEditorBottombarState extends State<TuneEditorBottombar> {
-  final _textStyle = const TextStyle(fontSize: 10.0);
+  final _textStyle = const TextStyle(fontSize: 11.0);
 
-  final _iconSize = 22.0;
+  final _iconSize = 24.0;
 
   late final ValueNotifier<double> _sliderValue = ValueNotifier(
     widget.tuneAdjustmentMatrix[widget.selectedIndex].value,
