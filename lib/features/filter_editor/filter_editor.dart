@@ -15,6 +15,7 @@ import '/features/filter_editor/widgets/filter_editor_appbar.dart';
 import '/pro_image_editor.dart';
 import '/shared/services/content_recorder/widgets/content_recorder.dart';
 import '/shared/utils/file_constructor_utils.dart';
+import '/shared/widgets/editor_safe_area_bottom_bar.dart';
 import '/shared/widgets/layer/layer_stack.dart';
 import '/shared/widgets/transform/transformed_content_generator.dart';
 import 'constants/identity_matrix_constant.dart';
@@ -287,7 +288,8 @@ class FilterEditorState extends State<FilterEditor>
           value: filterEditorConfigs.style.uiOverlayStyle,
           child: SafeArea(
             top: filterEditorConfigs.safeArea.top,
-            bottom: filterEditorConfigs.safeArea.bottom,
+            // Bottom safe area is handled by the bottom bar wrapper.
+            bottom: false,
             left: filterEditorConfigs.safeArea.left,
             right: filterEditorConfigs.safeArea.right,
             child: RecordInvisibleWidget(
@@ -299,7 +301,11 @@ class FilterEditorState extends State<FilterEditor>
                   backgroundColor: filterEditorConfigs.style.background,
                   appBar: _buildAppBar(),
                   body: _buildBody(),
-                  bottomNavigationBar: _buildBottomNavBar(),
+                  bottomNavigationBar: EditorSafeAreaBottomBar(
+                    color: filterEditorConfigs.style.background,
+                    applyBottomSafeArea: filterEditorConfigs.safeArea.bottom,
+                    child: _buildBottomNavBar(),
+                  ),
                 ),
               ),
             ),

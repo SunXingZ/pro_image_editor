@@ -14,6 +14,7 @@ import '/features/tune_editor/widgets/tune_editor_bottombar.dart';
 import '/pro_image_editor.dart';
 import '/shared/services/content_recorder/widgets/content_recorder.dart';
 import '/shared/utils/file_constructor_utils.dart';
+import '/shared/widgets/editor_safe_area_bottom_bar.dart';
 import '/shared/widgets/layer/layer_stack.dart';
 import '/shared/widgets/transform/transformed_content_generator.dart';
 import 'utils/tune_presets.dart';
@@ -387,7 +388,8 @@ class TuneEditorState extends State<TuneEditor>
           value: tuneEditorConfigs.style.uiOverlayStyle,
           child: SafeArea(
             top: tuneEditorConfigs.safeArea.top,
-            bottom: tuneEditorConfigs.safeArea.bottom,
+            // Bottom safe area is handled by the bottom bar wrapper.
+            bottom: false,
             left: tuneEditorConfigs.safeArea.left,
             right: tuneEditorConfigs.safeArea.right,
             child: RecordInvisibleWidget(
@@ -399,7 +401,11 @@ class TuneEditorState extends State<TuneEditor>
                   backgroundColor: tuneEditorConfigs.style.background,
                   appBar: _buildAppBar(),
                   body: _buildBody(),
-                  bottomNavigationBar: _buildBottomNavBar(),
+                  bottomNavigationBar: EditorSafeAreaBottomBar(
+                    color: tuneEditorConfigs.style.bottomBarBackground,
+                    applyBottomSafeArea: tuneEditorConfigs.safeArea.bottom,
+                    child: _buildBottomNavBar(),
+                  ),
                 ),
               ),
             ),

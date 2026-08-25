@@ -29,6 +29,7 @@ import '/shared/utils/default_editor_theme.dart';
 import '/shared/utils/file_constructor_utils.dart';
 import '/shared/utils/transparent_image_generator_utils.dart';
 import '/shared/widgets/adaptive_dialog.dart';
+import '/shared/widgets/editor_safe_area_bottom_bar.dart';
 import '/shared/widgets/extended/interactive_viewer/extended_interactive_viewer.dart';
 import '/shared/widgets/screen_resize_detector.dart';
 import '../audio_editor/audio_editor_page.dart';
@@ -3343,8 +3344,11 @@ class ProImageEditorState extends State<ProImageEditor>
                                         _audioBottomBarNotifier.value = false;
                                       },
                                     )
-                                  : _buildBottomNavBar() ??
-                                        const SizedBox.shrink(),
+                                  : EditorScaledBottomSafeArea(
+                                      child:
+                                          _buildBottomNavBar() ??
+                                          const SizedBox.shrink(),
+                                    ),
                             );
                           },
                         ),

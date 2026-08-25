@@ -22,6 +22,7 @@ import '/shared/services/shader_manager.dart';
 import '/shared/styles/platform_text_styles.dart';
 import '/shared/utils/file_constructor_utils.dart';
 import '/shared/widgets/auto_image.dart';
+import '/shared/widgets/editor_safe_area_bottom_bar.dart';
 import '/shared/widgets/extended/interactive_viewer/extended_interactive_viewer.dart';
 import '/shared/widgets/layer/layer_stack.dart';
 import '/shared/widgets/slider_bottom_sheet.dart';
@@ -887,7 +888,8 @@ class PaintEditorState extends State<PaintEditor>
           ),
           child: SafeArea(
             top: paintEditorConfigs.safeArea.top,
-            bottom: paintEditorConfigs.safeArea.bottom,
+            // Bottom safe area is handled by the bottom bar wrapper.
+            bottom: false,
             left: paintEditorConfigs.safeArea.left,
             right: paintEditorConfigs.safeArea.right,
             child: RecordInvisibleWidget(
@@ -902,7 +904,18 @@ class PaintEditorState extends State<PaintEditor>
                       backgroundColor: paintEditorConfigs.style.background,
                       appBar: _buildAppBar(constraints),
                       body: _buildBody(),
-                      bottomNavigationBar: _buildBottomBar(),
+                      bottomNavigationBar: EditorSafeAreaBottomBar(
+                        color: paintEditorConfigs.style.bottomBarBackground,
+                        applyBottomSafeArea: paintEditorConfigs.safeArea.bottom,
+                        // BottomAppBar 内部自带 SafeArea，这里把上下内边距都移除，
+                        // 避免与包装组件的安全区重复叠加、或把状态栏高度垫进栏内
+                        child: MediaQuery.removePadding(
+                          context: context,
+                          removeTop: true,
+                          removeBottom: true,
+                          child: _buildBottomBar() ?? const SizedBox.shrink(),
+                        ),
+                      ),
                     ),
                   );
                 },

@@ -24,6 +24,7 @@ import '/shared/services/content_recorder/widgets/record_invisible_widget.dart';
 import '/shared/services/layer_transform_generator.dart';
 import '/shared/utils/file_constructor_utils.dart';
 import '/shared/utils/transparent_image_generator_utils.dart';
+import '/shared/widgets/editor_safe_area_bottom_bar.dart';
 import '/shared/widgets/extended/extended_custom_paint.dart';
 import '/shared/widgets/extended/extended_transform_scale.dart';
 import '/shared/widgets/extended/extended_transform_translate.dart';
@@ -2565,7 +2566,8 @@ class CropRotateEditorState extends State<CropRotateEditor>
       tiltMode: _tiltMode,
       child: SafeArea(
         top: cropRotateEditorConfigs.safeArea.top,
-        bottom: cropRotateEditorConfigs.safeArea.bottom,
+        // Bottom safe area is handled by the bottom bar wrapper.
+        bottom: false,
         left: cropRotateEditorConfigs.safeArea.left,
         right: cropRotateEditorConfigs.safeArea.right,
         child: RecordInvisibleWidget(
@@ -2614,7 +2616,21 @@ class CropRotateEditorState extends State<CropRotateEditor>
                             ),
                           ],
                         ),
-                        bottomNavigationBar: _buildBottomAppBar(),
+                        bottomNavigationBar: EditorSafeAreaBottomBar(
+                          color:
+                              cropRotateEditorConfigs.style.bottomBarBackground,
+                          applyBottomSafeArea:
+                              cropRotateEditorConfigs.safeArea.bottom,
+                          // BottomAppBar 内部自带 SafeArea，这里把上下内边距都移除，
+                          // 避免与包装组件的安全区重复叠加、或把状态栏高度垫进栏内
+                          child: MediaQuery.removePadding(
+                            context: context,
+                            removeTop: true,
+                            removeBottom: true,
+                            child:
+                                _buildBottomAppBar() ?? const SizedBox.shrink(),
+                          ),
+                        ),
                       ),
                     ),
                   ),

@@ -16,6 +16,7 @@ import '/core/utils/size_utils.dart';
 import '/pro_image_editor.dart';
 import '/shared/services/content_recorder/widgets/content_recorder.dart';
 import '/shared/utils/file_constructor_utils.dart';
+import '/shared/widgets/editor_safe_area_bottom_bar.dart';
 import '/shared/widgets/transform/transformed_content_generator.dart';
 
 export 'models/shader_filter_state.dart';
@@ -404,7 +405,8 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
           value: configs.pixelsmixEditor.style.uiOverlayStyle,
           child: SafeArea(
             top: configs.pixelsmixEditor.safeArea.top,
-            bottom: configs.pixelsmixEditor.safeArea.bottom,
+            // Bottom safe area is handled by the bottom bar wrapper.
+            bottom: false,
             left: configs.pixelsmixEditor.safeArea.left,
             right: configs.pixelsmixEditor.safeArea.right,
             child: RecordInvisibleWidget(
@@ -416,7 +418,12 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
                   backgroundColor: configs.pixelsmixEditor.style.background,
                   appBar: _buildAppBar(),
                   body: _buildBody(),
-                  bottomNavigationBar: _buildBottomNavBar(),
+                  bottomNavigationBar: EditorSafeAreaBottomBar(
+                    color: configs.pixelsmixEditor.style.bottomBarBackground,
+                    applyBottomSafeArea:
+                        configs.pixelsmixEditor.safeArea.bottom,
+                    child: _buildBottomNavBar(),
+                  ),
                 ),
               ),
             ),

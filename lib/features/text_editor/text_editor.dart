@@ -12,6 +12,7 @@ import '/features/text_editor/widgets/text_editor_color_picker.dart';
 import '/features/text_editor/widgets/text_editor_input.dart';
 import '/pro_image_editor.dart';
 import '/shared/extensions/color_extension.dart';
+import '/shared/widgets/editor_safe_area_bottom_bar.dart';
 import '/shared/widgets/slider_bottom_sheet.dart';
 import 'widgets/text_editor_bottom_bar.dart';
 
@@ -357,7 +358,8 @@ class TextEditorState extends State<TextEditor>
             ),
             child: SafeArea(
               top: textEditorConfigs.safeArea.top,
-              bottom: textEditorConfigs.safeArea.bottom,
+              // Bottom safe area is handled by the bottom bar wrapper.
+              bottom: false,
               left: textEditorConfigs.safeArea.left,
               right: textEditorConfigs.safeArea.right,
               child: MediaQuery.removePadding(
@@ -369,7 +371,11 @@ class TextEditorState extends State<TextEditor>
                   backgroundColor: textEditorConfigs.style.background,
                   appBar: _buildAppBar(constraints),
                   body: _buildBody(),
-                  bottomNavigationBar: _buildBottomBar(),
+                  bottomNavigationBar: EditorSafeAreaBottomBar(
+                    color: textEditorConfigs.style.bottomBarBackground,
+                    applyBottomSafeArea: textEditorConfigs.safeArea.bottom,
+                    child: _buildBottomBar(),
+                  ),
                 ),
               ),
             ),
