@@ -437,7 +437,10 @@ class ShaderRenderer {
               (v is List && v.length > 1) ? (v[1] as num).toDouble() : 0.0;
           final b =
               (v is List && v.length > 2) ? (v[2] as num).toDouble() : 0.0;
-          final x = (minHue + (maxHue - minHue) * ((h + 100) / 200)) / 100.0;
+          // 与 RN HslMix.getColorShifts 一致：hue 为 -100~100 的滑杆值，
+          // 换算 lerp(minHue, maxHue, hue)/100 = (minHue + (maxHue-minHue)*hue)/100。
+          // 之前多除了一次 100，导致 Hue 位移比 RN 弱约 100 倍、肉眼不生效。
+          final x = (minHue + (maxHue - minHue) * h) / 100.0;
           final y = (100 + s) / 100;
           final z = (100 + b) / 100;
           setFloat(i * 3 + 2, x);

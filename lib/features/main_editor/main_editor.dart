@@ -2341,7 +2341,9 @@ class ProImageEditorState extends State<ProImageEditor>
     if (shaderFilters == null) return;
 
     // 重编辑同一工具（模糊的圆形/线性视为同一工具）时，在原位置替换
-    // 旧状态，保持效果叠加顺序不变；不同工具之间正常叠加。
+    // 旧状态并保证每种工具仅保留一条；不同工具之间正常叠加。渲染时的
+    // 实际叠加顺序由 ShaderFilteredWidget 按 RN 固定顺序统一排序，
+    // 与此处列表顺序无关。
     final merged =
         stateManager.activeShaderFilters.map((e) => e.copy()).toList();
     for (final inc in shaderFilters) {

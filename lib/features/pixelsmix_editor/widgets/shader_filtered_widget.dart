@@ -24,7 +24,10 @@ class ShaderFilteredWidget extends StatefulWidget {
     this.sourceImage,
   });
 
-  /// 需要应用的 shader 效果列表（按顺序链式应用）。
+  /// 需要应用的 shader 效果列表。
+  ///
+  /// 渲染时按 RN `GPUImage` 固定的叠加顺序排序（Lut 最内层、ToneCurve
+  /// 最外层），不随用户操作顺序变化，保证与 RN 叠加结果一致。
   final List<ShaderFilterState> shaderFilters;
 
   /// 视频播放时间通知器；为空时所有效果无条件生效。
@@ -109,6 +112,16 @@ class _ShaderFilteredWidgetState extends State<ShaderFilteredWidget> {
     setState(() {});
   }
 
+  /// 按 RN 固定叠加顺序排序后的效果列表（Lut 最先、ToneCurve 最后）。
+  List<ShaderFilterState> _sortedFilters() {
+    final list = List<ShaderFilterState>.of(widget.shaderFilters)
+      ..sort(
+        (a, b) => shaderToolCompositionOrder(a.tool)
+            .compareTo(shaderToolCompositionOrder(b.tool)),
+      );
+    return list;
+  }
+
   Future<void> _prepare() async {
     if (!_supported) return;
     // 合并并发准备：拖拽过程中只执行最新一次，避免异步重建堆积造成卡顿。
@@ -122,7 +135,7 @@ class _ShaderFilteredWidgetState extends State<ShaderFilteredWidget> {
     final seq = _prepareSeq;
 
     final passes = <ShaderRenderPass>[];
-    for (final state in widget.shaderFilters) {
+    for (final state in _sortedFilters()) {
       final pass = await ShaderRenderer.instance.prepare(
         state,
         source: widget.sourceImage,
@@ -189,8 +202,9 @@ class _ShaderFilteredWidgetState extends State<ShaderFilteredWidget> {
       }
       if (usedPasses.isEmpty) return widget.child;
 
-      // 按列表顺序链式应用：先加入的效果作用于原图（最内层），
-      // 后加入的效果叠加在最上层，与用户操作顺序一致。
+      // 按 RN 固定叠加顺序链式应用：先加入的效果作用于原图（最内层，
+      // 如 Lut），后加入的效果叠加在最上层（如 ToneCurve），与用户
+      // 操作顺序无关，保证叠加结果与 RN 一致。
       var child = widget.child;
       for (final pass in usedPasses) {
         child = ImageFiltered(
@@ -211,7 +225,7 @@ class _ShaderFilteredWidgetState extends State<ShaderFilteredWidget> {
     );
   }
 
-  /// 解析当前应使用的渲染 pass 列表（顺序与 [widget.shaderFilters] 一致）。
+  /// 解析当前应使用的渲染 pass 列表（顺序与 RN 固定叠加顺序一致）。
   ///
   /// 优先使用已就绪（纹理键匹配当前状态）的异步准备 pass；当某个效果刚被
   /// 重新编辑、异步重载尚未完成时，优先回退到全局缓存中该状态最新准备好的
@@ -219,7 +233,7 @@ class _ShaderFilteredWidgetState extends State<ShaderFilteredWidget> {
   /// pass 造成的闪屏；均不可用时沿用旧 pass 兜底，避免该效果整体缺失。
   List<ShaderRenderPass> _resolvedPasses() {
     final result = <ShaderRenderPass>[];
-    for (final s in widget.shaderFilters) {
+    for (final s in _sortedFilters()) {
       ShaderRenderPass? pass;
       for (final p in _passes) {
         if (p.state.tool == s.tool) {

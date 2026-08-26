@@ -63,6 +63,29 @@ enum ShaderTool {
   }
 }
 
+/// RN `GPUImage` 固定的着色器叠加顺序（值越小越先作用于原图）。
+///
+/// 对应 RN `ImageEditorPage.tsx` 中 GPUImage 的 JSX 嵌套顺序：Lut 最内层
+/// 最先应用，ToneCurve 最外层最后叠加，与用户操作顺序无关。Flutter 侧渲染
+/// 时按此顺序对效果排序，保证任意操作顺序下叠加结果与 RN 一致。
+int shaderToolCompositionOrder(ShaderTool tool) => switch (tool) {
+      ShaderTool.lut => 0,
+      ShaderTool.colorMatrix => 1,
+      ShaderTool.selectiveBlur || ShaderTool.tiltShiftBlur => 2,
+      ShaderTool.sharpen => 3,
+      ShaderTool.vignette => 4,
+      ShaderTool.highlightShadow => 5,
+      ShaderTool.vibrance => 6,
+      ShaderTool.haze => 7,
+      ShaderTool.highlightShadowTint => 8,
+      ShaderTool.noise => 9,
+      ShaderTool.hslMix => 10,
+      // RN 交互预览无 colorBalance 节点（其 UI 驱动 highlightShadowTint），
+      // 此处按同类最终调色步骤排在 HSL 之后、ToneCurve 之前。
+      ShaderTool.colorBalance => 11,
+      ShaderTool.toneCurve => 12,
+    };
+
 /// 一条可序列化的 Pixelsmix 调色 / 滤镜效果。
 ///
 /// 与 [FilterState] / [TuneAdjustmentMatrix] 平行：携带视频时间轴字段，
