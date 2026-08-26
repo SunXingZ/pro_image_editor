@@ -2196,11 +2196,18 @@ class ProImageEditorState extends State<ProImageEditor>
 
     if (tuneAdjustments == null) return;
 
+    // 同类型（id）调色用新值替换：re-edit 时 activeTuneAdjustments 已有旧值，
+    // 直接追加会生成重复条目（如两个 brightness），ColorFilterGenerator 会把
+    // 它们叠加，导致主编辑器数值错误（改 50 仍显示 100）。
+    final merged = <TuneAdjustmentMatrix>[
+      ...stateManager.activeTuneAdjustments
+          .where((old) => !tuneAdjustments.any((n) => n.id == old.id))
+          .map((item) => item.copy()),
+      ...tuneAdjustments,
+    ];
+
     addHistory(
-      tuneAdjustments: [
-        ...stateManager.activeTuneAdjustments.map((item) => item.copy()),
-        ...tuneAdjustments,
-      ],
+      tuneAdjustments: merged,
       heroScreenshotRequired: true,
     );
 
@@ -2245,11 +2252,17 @@ class ProImageEditorState extends State<ProImageEditor>
 
     if (filterState == null) return;
 
+    // 同名滤镜用新值替换：同一滤镜重复叠加无意义，且 re-edit 时旧值残留
+    // 会与 openTuneEditor 一样导致主编辑器效果错误。
+    final merged = <FilterState>[
+      ...stateManager.activeFilters
+          .where((old) => old.name != filterState.name)
+          .map((item) => item.copy()),
+      filterState,
+    ];
+
     addHistory(
-      filters: [
-        ...stateManager.activeFilters.map((item) => item.copy()),
-        filterState,
-      ],
+      filters: merged,
       heroScreenshotRequired: true,
     );
 
