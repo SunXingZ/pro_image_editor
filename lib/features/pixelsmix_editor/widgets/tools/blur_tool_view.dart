@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/core/models/i18n/i18n_pixelsmix_editor.dart';
 import '/shared/widgets/edit_slider.dart';
 import '../../models/shader_filter_state.dart';
 
@@ -13,6 +14,7 @@ class BlurToolView extends StatefulWidget {
     super.key,
     required this.current,
     required this.onChanged,
+    required this.i18n,
   });
 
   /// 当前生效的模糊效果（用于初始化）。
@@ -20,6 +22,9 @@ class BlurToolView extends StatefulWidget {
 
   /// 状态变化回调（携带完整 [ShaderFilterState]）。
   final ValueChanged<ShaderFilterState> onChanged;
+
+  /// 本地化文案（类型 / 强度标签）。
+  final I18nPixelsmixEditor i18n;
 
   @override
   State<BlurToolView> createState() => _BlurToolViewState();
@@ -68,8 +73,8 @@ class _BlurToolViewState extends State<BlurToolView> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               for (final (label, circular) in [
-                ('Circular', true),
-                ('Linear', false),
+                (widget.i18n.circular, true),
+                (widget.i18n.linear, false),
               ])
                 GestureDetector(
                   onTap: () {
@@ -106,7 +111,7 @@ class _BlurToolViewState extends State<BlurToolView> {
         ),
         // 强度
         EditSlider(
-          label: 'Intensity',
+          label: widget.i18n.intensity,
           value: _intensity.clamp(0, 30),
           min: 0,
           max: 30,

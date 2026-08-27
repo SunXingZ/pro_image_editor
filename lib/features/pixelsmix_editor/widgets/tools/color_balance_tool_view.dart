@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/core/models/i18n/i18n_pixelsmix_editor.dart';
 import '/shared/widgets/edit_slider.dart';
 
 /// 色彩平衡工具面板。
@@ -15,6 +16,7 @@ class ColorBalanceToolView extends StatefulWidget {
     super.key,
     required this.params,
     required this.onChanged,
+    required this.i18n,
   });
 
   /// 当前参数。
@@ -23,18 +25,23 @@ class ColorBalanceToolView extends StatefulWidget {
   /// 参数变化回调。
   final ValueChanged<Map<String, dynamic>> onChanged;
 
+  /// 本地化文案（波段标签）。
+  final I18nPixelsmixEditor i18n;
+
   @override
   State<ColorBalanceToolView> createState() => _ColorBalanceToolViewState();
 }
 
 class _ColorBalanceToolViewState extends State<ColorBalanceToolView> {
   static const List<String> _bands = ['shadows', 'midtones', 'highlights'];
-  static const List<String> _bandLabels = [
-    'Shadows',
-    'Midtones',
-    'Highlights',
-  ];
   static const List<String> _channels = ['R', 'G', 'B'];
+
+  /// 波段显示名（阴影 / 中间调 / 高光）。
+  List<String> get _bandLabels => [
+        widget.i18n.shadows,
+        widget.i18n.midtones,
+        widget.i18n.highlights,
+      ];
 
   /// 9 个值（band*3 + channel），本地驱动保证拖拽流畅。
   late List<double> _local = _fromParams();

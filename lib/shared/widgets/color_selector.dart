@@ -169,9 +169,9 @@ class _ColorPickerPanelState extends State<_ColorPickerPanel> {
                 color: const Color(0xFF141414),
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Text(
-                '完成',
-                style: TextStyle(fontSize: 12, color: Color(0xFFE3E3E3)),
+              child: Text(
+                MaterialLocalizations.of(context).okButtonLabel,
+                style: const TextStyle(fontSize: 12, color: Color(0xFFE3E3E3)),
               ),
             ),
           ),

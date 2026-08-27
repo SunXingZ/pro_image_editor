@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '/core/models/i18n/i18n_pixelsmix_editor.dart';
 import '/shared/utils/color_matrix_presets.dart';
 
 /// 颜色矩阵工具面板（对齐 RN `ImageLens`）。
@@ -18,6 +19,7 @@ class ColorMatrixToolView extends StatefulWidget {
     super.key,
     required this.params,
     required this.onChanged,
+    required this.i18n,
     this.previewSource,
   });
 
@@ -27,6 +29,9 @@ class ColorMatrixToolView extends StatefulWidget {
   /// 参数变化回调。
   final ValueChanged<Map<String, dynamic>> onChanged;
 
+  /// 本地化文案（分类标签）。
+  final I18nPixelsmixEditor i18n;
+
   /// 源图就绪通知器（当前编辑图片）。
   final ValueListenable<ui.Image?>? previewSource;
 
@@ -35,13 +40,14 @@ class ColorMatrixToolView extends StatefulWidget {
 }
 
 class _ColorMatrixToolViewState extends State<ColorMatrixToolView> {
-  static const List<(String, String)> _classifies = [
-    ('all', '全部'),
-    ('recommend', '推荐'),
-    ('warm', '暖'),
-    ('cool', '冷'),
-    ('bw', '黑白'),
-  ];
+  /// 分类 key + 显示名（全部 / 推荐 / 暖 / 冷 / 黑白）。
+  List<(String, String)> get _classifies => [
+        ('all', widget.i18n.colorMatrixAll),
+        ('recommend', widget.i18n.colorMatrixRecommended),
+        ('warm', widget.i18n.colorMatrixWarm),
+        ('cool', widget.i18n.colorMatrixCool),
+        ('bw', widget.i18n.colorMatrixBw),
+      ];
 
   String _classify = 'all';
 

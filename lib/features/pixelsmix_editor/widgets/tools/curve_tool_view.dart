@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pixelsmix_filters/pixelsmix_filters.dart';
 
+import '/core/models/i18n/i18n_pixelsmix_editor.dart';
+
 import 'restorable_curve_panel.dart';
 
 /// 色调曲线工具面板。
@@ -18,6 +20,7 @@ class CurveToolView extends StatelessWidget {
     required this.params,
     required this.onChanged,
     required this.controller,
+    required this.i18n,
     this.curveHeight,
   });
 
@@ -29,6 +32,9 @@ class CurveToolView extends StatelessWidget {
 
   /// 与画布 / 操作区共享的控制器。
   final CurveEditorController controller;
+
+  /// 本地化文案（操作区 tooltip 等）。
+  final I18nPixelsmixEditor i18n;
 
   /// 曲线区域高度；为空时使用默认值。
   final double? curveHeight;
@@ -79,7 +85,10 @@ class CurveToolView extends StatelessWidget {
   }
 
   /// 底部操作区（通道切换 / 重置 / 网格）。
-  Widget buildControls() => CurveToolControls(controller: controller);
+  Widget buildControls() => CurveToolControls(
+        controller: controller,
+        i18n: i18n,
+      );
 
   @override
   Widget build(BuildContext context) => buildControls();

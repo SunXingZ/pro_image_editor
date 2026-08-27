@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/core/models/i18n/i18n_pixelsmix_editor.dart';
 import '/shared/widgets/color_selector.dart';
 import '/shared/widgets/edit_slider.dart';
 
@@ -16,6 +17,7 @@ class HighlightShadowTintToolView extends StatefulWidget {
     super.key,
     required this.params,
     required this.onChanged,
+    required this.i18n,
   });
 
   /// 当前参数。
@@ -23,6 +25,9 @@ class HighlightShadowTintToolView extends StatefulWidget {
 
   /// 参数变化回调。
   final ValueChanged<Map<String, dynamic>> onChanged;
+
+  /// 本地化文案（阴影 / 高光行标签）。
+  final I18nPixelsmixEditor i18n;
 
   static const List<Color> _shadowSwatch = [
     Color(0xFFFF0000),
@@ -87,7 +92,7 @@ class _HighlightShadowTintToolViewState
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildRow(
-          'Shadow',
+          widget.i18n.shadow,
           'shadowTint',
           'shadowTintColor',
           HighlightShadowTintToolView._shadowSwatch,
@@ -97,7 +102,7 @@ class _HighlightShadowTintToolViewState
           (v) => setState(() => _shadowIntensity = v),
         ),
         _buildRow(
-          'Highlight',
+          widget.i18n.highlight,
           'highlightTint',
           'highlightTintColor',
           HighlightShadowTintToolView._highlightSwatch,

@@ -136,7 +136,7 @@ class _PlatformPopupBtnState extends State<PlatformPopupBtn> {
         isDefaultAction: false,
         isDestructiveAction: true,
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     );
   }

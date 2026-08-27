@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/core/models/i18n/i18n_pixelsmix_editor.dart';
 import '/shared/utils/lut/lut_parser.dart';
 import '/shared/widgets/edit_slider.dart';
 
@@ -16,6 +17,7 @@ class LutToolView extends StatefulWidget {
     super.key,
     required this.params,
     required this.onChanged,
+    required this.i18n,
     this.onPickLut,
   });
 
@@ -24,6 +26,9 @@ class LutToolView extends StatefulWidget {
 
   /// 参数变化回调。
   final ValueChanged<Map<String, dynamic>> onChanged;
+
+  /// 本地化文案（选择文件 / 启用 / 强度）。
+  final I18nPixelsmixEditor i18n;
 
   /// LUT 文件选择回调（宿主应用注入）；为空时隐藏「选择文件」入口。
   final Future<List<LutData>> Function()? onPickLut;
@@ -92,8 +97,8 @@ class _LutToolViewState extends State<LutToolView> {
               ),
               child: Text(
                 widget.onPickLut == null
-                    ? (hasLut ? _name : '未配置 LUT 选择器')
-                    : (hasLut ? _name : '选择文件'),
+                    ? (hasLut ? _name : widget.i18n.lutNotConfigured)
+                    : (hasLut ? _name : widget.i18n.selectFile),
                 style: const TextStyle(fontSize: 12, color: Color(0xFFE3E3E3)),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -107,9 +112,9 @@ class _LutToolViewState extends State<LutToolView> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Enable',
-                style: TextStyle(color: Colors.white70, fontSize: 13),
+              Text(
+                widget.i18n.enable,
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               Switch(
                 activeTrackColor: const Color(0xFF7B6CFF),
@@ -125,7 +130,7 @@ class _LutToolViewState extends State<LutToolView> {
         ),
         // 强度滑杆
         EditSlider(
-          label: 'Intensity',
+          label: widget.i18n.intensity,
           value: _intensity.clamp(0, 100),
           min: 0,
           max: 100,

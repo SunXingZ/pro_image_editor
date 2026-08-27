@@ -13,12 +13,15 @@ import 'i18n_text_editor.dart';
 import 'i18n_tune_editor.dart';
 import 'i18n_various.dart';
 
+export 'editor_i18n.dart';
 export 'i18n_audio_editor.dart';
 export 'i18n_blur_editor.dart';
 export 'i18n_clips_editor.dart';
 export 'i18n_crop_rotate_editor.dart';
 export 'i18n_emoji_editor.dart';
 export 'i18n_filter_editor.dart';
+export 'i18n_ja.dart';
+export 'i18n_ko.dart';
 export 'i18n_layer_interaction.dart';
 export 'i18n_paint_editor.dart';
 export 'i18n_pixelsmix_editor.dart';
@@ -26,6 +29,9 @@ export 'i18n_sticker_editor.dart';
 export 'i18n_text_editor.dart';
 export 'i18n_tune_editor.dart';
 export 'i18n_various.dart';
+export 'i18n_vi.dart';
+export 'i18n_zh_hans.dart';
+export 'i18n_zh_hk.dart';
 
 /// The `I18n` class provides internationalization settings for the image editor
 /// and its components. It includes translations and messages for various parts

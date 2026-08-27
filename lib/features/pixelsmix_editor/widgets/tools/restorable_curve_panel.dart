@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:pixelsmix_filters/pixelsmix_filters.dart';
 
+import '/core/models/i18n/i18n_pixelsmix_editor.dart';
+
 /// 曲线编辑的共享控制器。
 ///
 /// 悬浮的曲线画布（[RestorableCurveCanvas]）与底部操作区
@@ -366,10 +368,17 @@ class _RestorableCurveCanvasState extends State<RestorableCurveCanvas> {
 /// 与悬浮的 [RestorableCurveCanvas] 通过同一个 [CurveEditorController] 联动。
 class CurveToolControls extends StatelessWidget {
   /// Creates a [CurveToolControls].
-  const CurveToolControls({super.key, required this.controller});
+  const CurveToolControls({
+    super.key,
+    required this.controller,
+    required this.i18n,
+  });
 
   /// 与画布共享的控制器。
   final CurveEditorController controller;
+
+  /// 本地化文案（重置 / 网格 tooltip）。
+  final I18nPixelsmixEditor i18n;
 
   @override
   Widget build(BuildContext context) {
@@ -387,7 +396,7 @@ class CurveToolControls extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.refresh, color: Colors.white70),
-                    tooltip: '重置曲线',
+                    tooltip: i18n.resetCurve,
                     onPressed: controller.reset,
                   ),
                   IconButton(
@@ -395,7 +404,7 @@ class CurveToolControls extends StatelessWidget {
                       controller.showGrid ? Icons.grid_on : Icons.grid_off,
                       color: Colors.white70,
                     ),
-                    tooltip: '显示/隐藏网格',
+                    tooltip: i18n.toggleGrid,
                     onPressed: controller.toggleGrid,
                   ),
                   IconButton(
@@ -405,7 +414,7 @@ class CurveToolControls extends StatelessWidget {
                           : Icons.visibility_off,
                       color: Colors.white70,
                     ),
-                    tooltip: '显示/隐藏曲线画布',
+                    tooltip: i18n.toggleCurveCanvas,
                     onPressed: controller.toggleCanvas,
                   ),
                 ],

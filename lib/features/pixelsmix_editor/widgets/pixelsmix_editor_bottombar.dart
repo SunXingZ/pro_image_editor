@@ -88,18 +88,28 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           onChanged: onChanged,
           curveHeight: 220,
           controller: curveController!,
+          i18n: i18n,
         );
 
       case ShaderTool.hslMix:
-        return HslToolView(params: params, onChanged: onChanged);
+        return HslToolView(
+          params: params,
+          onChanged: onChanged,
+          i18n: i18n,
+        );
 
       case ShaderTool.colorBalance:
-        return ColorBalanceToolView(params: params, onChanged: onChanged);
+        return ColorBalanceToolView(
+          params: params,
+          onChanged: onChanged,
+          i18n: i18n,
+        );
 
       case ShaderTool.highlightShadowTint:
         return HighlightShadowTintToolView(
           params: params,
           onChanged: onChanged,
+          i18n: i18n,
         );
 
       case ShaderTool.colorMatrix:
@@ -107,6 +117,7 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           params: params,
           onChanged: onChanged,
           previewSource: previewSource,
+          i18n: i18n,
         );
 
       case ShaderTool.lut:
@@ -114,6 +125,7 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           params: params,
           onChanged: onChanged,
           onPickLut: configs.lutFilePicker,
+          i18n: i18n,
         );
 
       case ShaderTool.selectiveBlur:
@@ -124,6 +136,7 @@ class PixelsmixEditorBottombar extends StatelessWidget {
         return BlurToolView(
           current: current,
           onChanged: onShaderStateChanged!,
+          i18n: i18n,
         );
 
       case ShaderTool.vibrance:
@@ -131,11 +144,11 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           params: params,
           onChanged: onChanged,
           textColor: textColor,
-          items: const [
+          items: [
             // RN ImageColors Vibrance：HSL 色带渐变轨道 + 中点吸附
             SliderToolItem(
               key: 'vibrance',
-              label: 'Vibrance',
+              label: i18n.toolLabels[ShaderTool.vibrance]!,
               initial: 50,
               snapToMiddle: true,
               trackColors: kHslBandColors,
@@ -148,7 +161,12 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           params: params,
           onChanged: onChanged,
           textColor: textColor,
-          items: const [SliderToolItem(key: 'haze', label: 'Haze')],
+          items: [
+            SliderToolItem(
+              key: 'haze',
+              label: i18n.toolLabels[ShaderTool.haze]!,
+            ),
+          ],
         );
 
       case ShaderTool.highlightShadow:
@@ -156,17 +174,17 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           params: params,
           onChanged: onChanged,
           textColor: textColor,
-          items: const [
+          items: [
             // RN ImageColors Tone：阴影 灰→白、高光 白→灰 渐变轨道
             SliderToolItem(
               key: 'shadows',
-              label: 'Shadows',
-              trackColors: [Color(0xFF4D4D4D), Colors.white],
+              label: i18n.shadows,
+              trackColors: const [Color(0xFF4D4D4D), Colors.white],
             ),
             SliderToolItem(
               key: 'highlights',
-              label: 'Highlights',
-              trackColors: [Colors.white, Color(0xFF4D4D4D)],
+              label: i18n.highlights,
+              trackColors: const [Colors.white, Color(0xFF4D4D4D)],
             ),
           ],
         );
@@ -176,7 +194,12 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           params: params,
           onChanged: onChanged,
           textColor: textColor,
-          items: const [SliderToolItem(key: 'sharpen', label: 'Sharpen')],
+          items: [
+            SliderToolItem(
+              key: 'sharpen',
+              label: i18n.toolLabels[ShaderTool.sharpen]!,
+            ),
+          ],
         );
 
       case ShaderTool.noise:
@@ -184,7 +207,12 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           params: params,
           onChanged: onChanged,
           textColor: textColor,
-          items: const [SliderToolItem(key: 'noise', label: 'Noise')],
+          items: [
+            SliderToolItem(
+              key: 'noise',
+              label: i18n.toolLabels[ShaderTool.noise]!,
+            ),
+          ],
         );
 
       case ShaderTool.vignette:
@@ -192,7 +220,12 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           params: params,
           onChanged: onChanged,
           textColor: textColor,
-          items: const [SliderToolItem(key: 'vignette', label: 'Vignette')],
+          items: [
+            SliderToolItem(
+              key: 'vignette',
+              label: i18n.toolLabels[ShaderTool.vignette]!,
+            ),
+          ],
         );
     }
   }

@@ -508,6 +508,7 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
         onChanged: onChanged,
         curveHeight: 220,
         controller: _curveEditorController,
+        i18n: i18n.pixelsmixEditor,
       );
 
   Widget _buildBackground() {

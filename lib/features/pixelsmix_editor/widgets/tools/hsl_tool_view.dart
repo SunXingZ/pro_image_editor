@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/core/models/i18n/i18n_pixelsmix_editor.dart';
 import '/shared/widgets/color_selector.dart';
 import '/shared/widgets/edit_slider.dart';
 import 'hsl_band_colors.dart';
@@ -18,6 +19,7 @@ class HslToolView extends StatefulWidget {
     super.key,
     required this.params,
     required this.onChanged,
+    required this.i18n,
   });
 
   /// 当前参数。
@@ -25,6 +27,9 @@ class HslToolView extends StatefulWidget {
 
   /// 参数变化回调。
   final ValueChanged<Map<String, dynamic>> onChanged;
+
+  /// 本地化文案（通道标签）。
+  final I18nPixelsmixEditor i18n;
 
   @override
   State<HslToolView> createState() => _HslToolViewState();
@@ -42,7 +47,12 @@ class _HslToolViewState extends State<HslToolView> {
     'fuchsia',
   ];
 
-  static const List<String> _labels = ['Hue', 'Saturation', 'Lightness'];
+  /// H / S / L 通道显示名。
+  List<String> get _labels => [
+        widget.i18n.hue,
+        widget.i18n.saturation,
+        widget.i18n.lightness,
+      ];
 
   int _selected = 0;
 
