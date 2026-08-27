@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 
 import '/core/models/editor_configs/pro_image_editor_configs.dart';
-import '/shared/widgets/color_picker/bar_color_picker.dart';
+import '/shared/widgets/color_selector.dart';
 import '../text_editor.dart';
 
 /// A widget for selecting and customizing text colors in the text editor,
@@ -61,27 +60,14 @@ class TextEditorColorPicker extends StatelessWidget {
     }
 
     return Align(
-      alignment: Alignment.topRight,
-      child: Container(
-        margin: null,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: BarColorPicker(
-          configs: configs,
-          length: min(
-            350,
-            MediaQuery.sizeOf(context).height -
-                MediaQuery.viewInsetsOf(context).bottom -
-                kToolbarHeight -
-                kBottomNavigationBarHeight -
-                10 * 2 -
-                MediaQuery.paddingOf(context).top,
-          ),
-          color: primaryColor,
-          horizontal: false,
-          thumbColor: Colors.white,
-          cornerRadius: 10,
-          pickMode: PickMode.color,
-          colorListener: (int value) => onUpdateColor(Color(value)),
+      alignment: Alignment.bottomCenter,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        child: ColorSelector(
+          colors: kDefaultColorPalette,
+          selected: primaryColor,
+          onSelect: onUpdateColor,
         ),
       ),
     );

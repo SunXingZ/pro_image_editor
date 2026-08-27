@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '/shared/widgets/edit_slider.dart';
+
 /// 色彩平衡工具面板。
 ///
 /// 顶部提供公共的 RGB 通道切换，下方显示所选通道对应的
@@ -124,39 +126,15 @@ class _ColorBalanceToolViewState extends State<ColorBalanceToolView> {
 
   Widget _buildBandRow(int band, Color color) {
     final value = _local[band * 3 + _channel];
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 88,
-            child: Text(
-              _bandLabels[band],
-              style: TextStyle(color: color, fontSize: 13),
-            ),
-          ),
-          Expanded(
-            child: Slider(
-              value: value.clamp(-1.0, 1.0),
-              min: -1,
-              max: 1,
-              divisions: 200,
-              onChanged: (v) => _set(band, v),
-            ),
-          ),
-          SizedBox(
-            width: 44,
-            child: Text(
-              value.toStringAsFixed(2),
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                color: color.withValues(alpha: 0.7),
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
+    return EditSlider(
+      label: _bandLabels[band],
+      value: value.clamp(-1.0, 1.0),
+      min: -1,
+      max: 1,
+      divisions: 200,
+      valueText: value.toStringAsFixed(2),
+      textColor: color,
+      onChanged: (v) => _set(band, v),
     );
   }
 }

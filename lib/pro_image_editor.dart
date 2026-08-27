@@ -66,6 +66,10 @@ export 'shared/services/content_recorder/utils/generate_high_quality_image.dart'
 export 'shared/utils/converters.dart';
 export 'shared/utils/decode_image.dart';
 export 'shared/widgets/color_picker/bar_color_picker.dart';
+export 'shared/widgets/color_selector.dart';
+export 'shared/widgets/edit_slider.dart';
+export 'shared/utils/color_matrix_presets.dart';
+export 'shared/utils/lut/lut_parser.dart';
 export 'shared/widgets/reactive_widgets/reactive_custom_appbar.dart';
 export 'shared/widgets/reactive_widgets/reactive_custom_widget.dart';
 export 'shared/widgets/extended/extended_pop_scope.dart';

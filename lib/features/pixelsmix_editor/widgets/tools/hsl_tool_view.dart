@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '/shared/widgets/color_selector.dart';
+import '/shared/widgets/edit_slider.dart';
+import 'hsl_band_colors.dart';
+
 /// HSL 混色工具面板。
 ///
-/// 8 色相各配 H/S/L 三个滑杆（-100~100）。
+/// 8 色相各配 H/S/L 三个滑杆（-100~100），轨道渐变与 RN `ImageHsl`
+/// 的 `hslSliderColors` 一致：
+/// - Hue：前一个色相 → 当前色相；
+/// - Saturation：同色相去饱和（灰）→ 全饱和；
+/// - Brightness：黑色 → 50% 明度。
 /// 参数结构：`{'colors': {'red': [h,s,b], ...}}`。
 class HslToolView extends StatefulWidget {
   /// Creates a [HslToolView].
@@ -32,17 +40,6 @@ class _HslToolViewState extends State<HslToolView> {
     'blue',
     'purple',
     'fuchsia',
-  ];
-
-  static const List<Color> _swatch = [
-    Color(0xFFFF0000),
-    Color(0xFFFFA500),
-    Color(0xFFFFFF00),
-    Color(0xFF00FF00),
-    Color(0xFF90EE90),
-    Color(0xFF0000FF),
-    Color(0xFF800080),
-    Color(0xFFFF00FF),
   ];
 
   static const List<String> _labels = ['Hue', 'Saturation', 'Lightness'];
@@ -82,75 +79,56 @@ class _HslToolViewState extends State<HslToolView> {
     }});
   }
 
+  /// Hue 轨道：前一个色相 → 当前色相（与 RN hslSliderColors.hue 一致）。
+  List<Color> _hueTrack() {
+    final prev = (_selected - 1 + _names.length) % _names.length;
+    return [kHslBandColors[prev], kHslBandColors[_selected]];
+  }
+
+  /// Saturation 轨道：同色相去饱和 → 全饱和。
+  List<Color> _satTrack() {
+    final hsl = HSLColor.fromColor(kHslBandColors[_selected]);
+    return [hsl.withSaturation(0).toColor(), hsl.withSaturation(1).toColor()];
+  }
+
+  /// Brightness 轨道：黑色 → 50% 明度。
+  List<Color> _brightnessTrack() {
+    final hsl = HSLColor.fromColor(kHslBandColors[_selected]);
+    return [hsl.withLightness(0).toColor(), hsl.withLightness(0.5).toColor()];
+  }
+
   @override
   Widget build(BuildContext context) {
     const textColor = Colors.white70;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 色相选择
+        // 色相选择（RN ImageHsl 的 ColorSelector 色块行）
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              for (var i = 0; i < _swatch.length; i++)
-                GestureDetector(
-                  onTap: () => setState(() => _selected = i),
-                  child: Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: _swatch[i],
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: _selected == i
-                            ? Colors.white
-                            : Colors.transparent,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+          child: ColorSelector(
+            colors: kHslBandColors,
+            selected: kHslBandColors[_selected],
+            showCustom: false,
+            onSelect: (c) =>
+                setState(() => _selected = kHslBandColors.indexOf(c)),
           ),
         ),
-        // H/S/L 滑杆
+        // H/S/L 滑杆（渐变轨道）
         for (var axis = 0; axis < 3; axis++)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 88,
-                  child: Text(
-                    _labels[axis],
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
-                  ),
-                ),
-                Expanded(
-                  child: Slider(
-                    value: (_local[_names[_selected]]![axis])
-                        .clamp(-100.0, 100.0),
-                    min: -100,
-                    max: 100,
-                    divisions: 200,
-                    onChanged: (v) => _update(axis, v),
-                  ),
-                ),
-                SizedBox(
-                  width: 44,
-                  child: Text(
-                    _local[_names[_selected]]![axis].toStringAsFixed(0),
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: textColor.withValues(alpha: 0.7),
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          EditSlider(
+            label: _labels[axis],
+            value: _local[_names[_selected]]![axis].clamp(-100.0, 100.0),
+            min: -100,
+            max: 100,
+            divisions: 200,
+            trackColors: switch (axis) {
+              0 => _hueTrack(),
+              1 => _satTrack(),
+              _ => _brightnessTrack(),
+            },
+            textColor: textColor,
+            onChanged: (v) => _update(axis, v),
           ),
       ],
     );

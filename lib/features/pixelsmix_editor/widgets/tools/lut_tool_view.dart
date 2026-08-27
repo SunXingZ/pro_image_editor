@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 
-/// LUT 工具面板。
+import '/shared/utils/lut/lut_parser.dart';
+import '/shared/widgets/edit_slider.dart';
+
+/// LUT 工具面板（对齐 RN `ImageLut`）。
 ///
-/// 预设 3D LUT + 强度滑杆。
-/// 参数结构：`{'preset': String, 'intensity': 0..100}`。
+/// 提供「选择文件」入口（由宿主应用通过 [PixelsmixEditorConfigs.lutFilePicker]
+/// 实现，选择并解析 .cube/.csp 文件）、启用开关与强度滑杆。
+/// 参数结构：
+/// `{'enable': bool, 'intensity': 0..100, 'name': String,
+///   'size': int, 'data': [r,g,b,...] 扁平化列表}`。
 class LutToolView extends StatefulWidget {
   /// Creates a [LutToolView].
   const LutToolView({
     super.key,
     required this.params,
     required this.onChanged,
+    this.onPickLut,
   });
 
   /// 当前参数。
@@ -18,21 +25,8 @@ class LutToolView extends StatefulWidget {
   /// 参数变化回调。
   final ValueChanged<Map<String, dynamic>> onChanged;
 
-  static const List<String> _presets = [
-    'identity',
-    'warm',
-    'cool',
-    'vivid',
-    'mono',
-  ];
-
-  static const Map<String, String> _labels = {
-    'identity': 'Original',
-    'warm': 'Warm',
-    'cool': 'Cool',
-    'vivid': 'Vivid',
-    'mono': 'Mono',
-  };
+  /// LUT 文件选择回调（宿主应用注入）；为空时隐藏「选择文件」入口。
+  final Future<List<LutData>> Function()? onPickLut;
 
   @override
   State<LutToolView> createState() => _LutToolViewState();
@@ -54,93 +48,94 @@ class _LutToolViewState extends State<LutToolView> {
     if (v is num) _intensity = v.toDouble();
   }
 
-  String get _preset => widget.params['preset'] as String? ?? 'identity';
+  bool get _enable => widget.params['enable'] as bool? ?? true;
+
+  String get _name => widget.params['name'] as String? ?? '';
+
+  Future<void> _pickLut() async {
+    final picker = widget.onPickLut;
+    if (picker == null) return;
+    final luts = await picker();
+    if (luts.isEmpty) return;
+    final lut = luts.first;
+    final flat = <double>[
+      for (final row in lut.data) ...row,
+    ];
+    widget.onChanged({
+      ...widget.params,
+      'name': lut.name,
+      'size': lut.size,
+      'data': flat,
+      'enable': true,
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     const color = Colors.white70;
-    const labels = LutToolView._labels;
-    const presets = LutToolView._presets;
+    final hasLut = widget.params['data'] is List &&
+        (widget.params['data'] as List).isNotEmpty;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 预设选择
+        // 选择文件（RN ImageLut 的圆角全宽按钮）
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Wrap(
-            spacing: 8,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: GestureDetector(
+            onTap: widget.onPickLut == null ? null : _pickLut,
+            child: Container(
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0xFF141414),
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Text(
+                widget.onPickLut == null
+                    ? (hasLut ? _name : '未配置 LUT 选择器')
+                    : (hasLut ? _name : '选择文件'),
+                style: const TextStyle(fontSize: 12, color: Color(0xFFE3E3E3)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ),
+        // 启用开关（RN ImageLut 的 Enable 行）
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              for (final p in presets)
-                GestureDetector(
-                  onTap: () =>
-                      widget.onChanged({...widget.params, 'preset': p}),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _preset == p
-                          ? const Color(0xFF3A3A3A)
-                          : const Color(0xFF1E1E1E),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: _preset == p
-                            ? const Color(0xFFFFD700)
-                            : const Color(0xFF333333),
-                      ),
-                    ),
-                    child: Text(
-                      labels[p] ?? p,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: _preset == p
-                            ? const Color(0xFFFFD700)
-                            : Colors.white70,
-                      ),
-                    ),
-                  ),
-                ),
+              const Text(
+                'Enable',
+                style: TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+              Switch(
+                activeTrackColor: const Color(0xFF7B6CFF),
+                activeThumbColor: Colors.white,
+                inactiveTrackColor: Colors.white,
+                inactiveThumbColor: Colors.white,
+                value: _enable,
+                onChanged: (v) =>
+                    widget.onChanged({...widget.params, 'enable': v}),
+              ),
             ],
           ),
         ),
-        // 强度
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Row(
-            children: [
-              const SizedBox(
-                width: 88,
-                child: Text(
-                  'Intensity',
-                  style: TextStyle(color: color, fontSize: 13),
-                ),
-              ),
-              Expanded(
-                child: Slider(
-                  value: _intensity.clamp(0, 100),
-                  min: 0,
-                  max: 100,
-                  divisions: 200,
-                  onChanged: (v) {
-                    setState(() => _intensity = v);
-                    widget.onChanged({...widget.params, 'intensity': v});
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 44,
-                child: Text(
-                  _intensity.toStringAsFixed(0),
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: color.withValues(alpha: 0.7),
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        // 强度滑杆
+        EditSlider(
+          label: 'Intensity',
+          value: _intensity.clamp(0, 100),
+          min: 0,
+          max: 100,
+          divisions: 200,
+          valueText: '${_intensity.round()}%',
+          textColor: color,
+          onChanged: (v) {
+            setState(() => _intensity = v);
+            widget.onChanged({...widget.params, 'intensity': v});
+          },
         ),
       ],
     );

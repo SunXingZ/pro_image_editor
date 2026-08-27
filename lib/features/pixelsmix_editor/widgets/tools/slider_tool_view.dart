@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '/shared/widgets/edit_slider.dart';
+
 /// 单个滑杆配置。
 class SliderToolItem {
   /// Creates a [SliderToolItem].
@@ -10,6 +12,8 @@ class SliderToolItem {
     this.max = 100,
     this.initial = 0,
     this.divisions = 200,
+    this.trackColors,
+    this.snapToMiddle = false,
   });
 
   /// 参数在 [Map] 中的键名。
@@ -29,6 +33,12 @@ class SliderToolItem {
 
   /// 滑杆分档数。
   final int divisions;
+
+  /// 轨道渐变颜色（对应 RN 滑杆的 `trackTintColors`，如鲜艳度 / 高光阴影）。
+  final List<Color>? trackColors;
+
+  /// 是否吸附中点（对应 RN 滑杆的 `autoAttach`，以 50 为中点的滑杆开启）。
+  final bool snapToMiddle;
 }
 
 /// 通用数值滑杆工具面板。
@@ -95,40 +105,16 @@ class _SliderToolViewState extends State<SliderToolView> {
   }
 
   Widget _buildRow(SliderToolItem item, Color color) {
-    final value = _values[item.key] ?? item.initial;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 88,
-            child: Text(
-              item.label,
-              style: TextStyle(color: color, fontSize: 13),
-            ),
-          ),
-          Expanded(
-            child: Slider(
-              value: value.clamp(item.min, item.max),
-              min: item.min,
-              max: item.max,
-              divisions: item.divisions,
-              onChanged: (v) => _update(item, v),
-            ),
-          ),
-          SizedBox(
-            width: 44,
-            child: Text(
-              value.toStringAsFixed(0),
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                color: color.withValues(alpha: 0.7),
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
+    return EditSlider(
+      label: item.label,
+      value: _values[item.key] ?? item.initial,
+      min: item.min,
+      max: item.max,
+      divisions: item.divisions,
+      trackColors: item.trackColors,
+      snapToMiddle: item.snapToMiddle,
+      textColor: color,
+      onChanged: (v) => _update(item, v),
     );
   }
 }

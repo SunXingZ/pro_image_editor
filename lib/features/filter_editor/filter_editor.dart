@@ -450,7 +450,7 @@ class FilterEditorState extends State<FilterEditor>
                                 _onChanged,
                                 _onChangedEnd,
                               ) ??
-                              Slider(
+                              EditSlider(
                                 min: 0,
                                 max: 1,
                                 divisions: 100,

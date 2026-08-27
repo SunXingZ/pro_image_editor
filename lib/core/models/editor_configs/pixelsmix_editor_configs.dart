@@ -1,3 +1,5 @@
+import '/shared/utils/lut/lut_parser.dart';
+
 import '../custom_widgets/pixelsmix_editor_widgets.dart';
 import '../icons/pixelsmix_editor_icons.dart';
 import '../styles/pixelsmix_editor_style.dart';
@@ -18,6 +20,7 @@ class PixelsmixEditorConfigs implements BaseSubEditorConfigs {
     this.style = const PixelsmixEditorStyle(),
     this.icons = const PixelsmixEditorIcons(),
     this.widgets = const PixelsmixEditorWidgets(),
+    this.lutFilePicker,
   });
 
   /// {@macro enableGesturePop}
@@ -39,6 +42,10 @@ class PixelsmixEditorConfigs implements BaseSubEditorConfigs {
   /// Widgets associated with the editor.
   final PixelsmixEditorWidgets widgets;
 
+  /// LUT 文件选择回调：由宿主应用实现（通常用文件选择器挑选 .cube/.csp
+  /// 并解析），返回解析后的 LUT 数据列表；为空时 LUT 工具不显示「选择文件」入口。
+  final Future<List<LutData>> Function()? lutFilePicker;
+
   /// Creates a copy of this [PixelsmixEditorConfigs] object.
   PixelsmixEditorConfigs copyWith({
     bool? enableGesturePop,
@@ -47,6 +54,7 @@ class PixelsmixEditorConfigs implements BaseSubEditorConfigs {
     PixelsmixEditorStyle? style,
     PixelsmixEditorIcons? icons,
     PixelsmixEditorWidgets? widgets,
+    Future<List<LutData>> Function()? lutFilePicker,
   }) {
     return PixelsmixEditorConfigs(
       enableGesturePop: enableGesturePop ?? this.enableGesturePop,
@@ -55,6 +63,7 @@ class PixelsmixEditorConfigs implements BaseSubEditorConfigs {
       style: style ?? this.style,
       icons: icons ?? this.icons,
       widgets: widgets ?? this.widgets,
+      lutFilePicker: lutFilePicker ?? this.lutFilePicker,
     );
   }
 }

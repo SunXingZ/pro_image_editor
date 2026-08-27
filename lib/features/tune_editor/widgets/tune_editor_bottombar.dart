@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '/core/models/editor_configs/tune_editor_configs.dart';
+import '/shared/widgets/edit_slider.dart';
 import '/shared/widgets/editor_scrollbar.dart';
 import '/shared/widgets/flat_icon_text_button.dart';
 import '../models/tune_adjustment_matrix.dart';
@@ -125,14 +126,14 @@ class _TuneEditorBottombarState extends State<TuneEditorBottombar> {
                     widget.onChanged,
                     widget.onChangedEnd,
                   ) ??
-                  Slider(
+                  EditSlider(
+                    value: value,
                     min: activeOption.min,
                     max: activeOption.max,
                     divisions: activeOption.divisions,
-                    label: (value * activeOption.labelMultiplier)
+                    valueText: (value * activeOption.labelMultiplier)
                         .round()
                         .toString(),
-                    value: value,
                     onChangeStart: (val) {
                       _sliderValue.value = val;
                       widget.onChangedStart(val);

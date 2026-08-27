@@ -222,6 +222,9 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
   /// 预览解码后的源图（供 done 时预准备模糊纹理等）。
   ui.Image? _previewSource;
 
+  /// 源图就绪通知器（供底部工具面板展示缩略图，如颜色矩阵预设）。
+  final ValueNotifier<ui.Image?> previewSourceNotifier = ValueNotifier(null);
+
   /// 曲线画布与底部操作区的共享控制器（toneCurve 工具使用）。
   CurveEditorController? _curveController;
 
@@ -258,6 +261,7 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
   @override
   void dispose() {
     _curveController?.dispose();
+    previewSourceNotifier.dispose();
     uiStream.close();
     super.dispose();
   }
@@ -511,6 +515,7 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
       image: editorImage,
       builder: (source) {
         _previewSource = source;
+        previewSourceNotifier.value = source;
         return Hero(
           tag: heroTag,
           createRectTween: (begin, end) => RectTween(begin: begin, end: end),
@@ -590,6 +595,7 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
       onShaderStateChanged: onShaderStateChanged,
       curveController:
           tool == ShaderTool.toneCurve ? _curveEditorController : null,
+      previewSource: previewSourceNotifier,
     );
   }
 

@@ -126,25 +126,11 @@ class _PaintEditorLayerEditorState extends State<PaintEditorLayerEditor> {
           child: Text(_configs.i18n.paintEditor.color),
         ),
         Padding(
-          padding: const EdgeInsets.only(left: 6.0, right: 12),
-          child: LayoutBuilder(
-            builder: (_, constraints) {
-              return BarColorPicker(
-                colorListener: (value) {
-                  _setColor(Color(value));
-                },
-                animationDuration: Duration.zero,
-                padding: EdgeInsets.zero,
-                configs: _configs,
-                thumbRadius: 8,
-                thumbColor: Colors.white,
-                cornerRadius: 10,
-                pickMode: PickMode.color,
-                color: widget.layer.item.color,
-                length: constraints.maxWidth - 16,
-                horizontal: true,
-              );
-            },
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ColorSelector(
+            colors: kDefaultColorPalette,
+            selected: widget.layer.item.color,
+            onSelect: _setColor,
           ),
         ),
       ],
@@ -157,20 +143,14 @@ class _PaintEditorLayerEditorState extends State<PaintEditorLayerEditor> {
     }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(_configs.i18n.paintEditor.opacity),
-          Slider(
-            value: _layer.opacity,
-            max: _configs.paintEditor.maxOpacity,
-            min: _configs.paintEditor.minOpacity,
-            divisions: _configs.paintEditor.divisionsOpacity,
-            padding: const EdgeInsets.only(top: 12, bottom: 20),
-            label: _layer.opacity.toStringAsFixed(2),
-            onChanged: _setOpacity,
-          ),
-        ],
+      child: EditSlider(
+        label: _configs.i18n.paintEditor.opacity,
+        value: _layer.opacity,
+        max: _configs.paintEditor.maxOpacity,
+        min: _configs.paintEditor.minOpacity,
+        divisions: _configs.paintEditor.divisionsOpacity,
+        valueText: _layer.opacity.toStringAsFixed(2),
+        onChanged: _setOpacity,
       ),
     );
   }
@@ -181,22 +161,15 @@ class _PaintEditorLayerEditorState extends State<PaintEditorLayerEditor> {
     }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(_configs.i18n.paintEditor.strokeWidth),
-          Slider(
-            value: _paintItem.strokeWidth,
-            max: _configs.paintEditor.maxStrokeWidth,
-            min: _configs.paintEditor.minStrokeWidth,
-            divisions: _configs.paintEditor.divisionsStrokeWidth,
-            padding: const EdgeInsets.only(top: 12, bottom: 20),
-            label: _paintItem.strokeWidth.toStringAsFixed(1),
-            onChanged: _paintItem.fill && _paintItem.canBeFilled
-                ? null
-                : _setStrokeWidth,
-          ),
-        ],
+      child: EditSlider(
+        label: _configs.i18n.paintEditor.strokeWidth,
+        value: _paintItem.strokeWidth,
+        max: _configs.paintEditor.maxStrokeWidth,
+        min: _configs.paintEditor.minStrokeWidth,
+        divisions: _configs.paintEditor.divisionsStrokeWidth,
+        valueText: _paintItem.strokeWidth.toStringAsFixed(1),
+        enabled: !(_paintItem.fill && _paintItem.canBeFilled),
+        onChanged: _setStrokeWidth,
       ),
     );
   }

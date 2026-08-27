@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import '/core/models/editor_configs/blur_editor_configs.dart';
+import '/shared/widgets/edit_slider.dart';
 
 import '../blur_editor.dart';
 
@@ -74,7 +75,7 @@ class BlurEditorBottombar extends StatelessWidget {
                       onChanged,
                       onChangedEnd,
                     ) ??
-                    Slider(
+                    EditSlider(
                       min: 0,
                       max: blurEditorConfigs.maxBlur,
                       divisions: 100,

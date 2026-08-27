@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '/shared/widgets/color_selector.dart';
+import '/shared/widgets/edit_slider.dart';
+
 /// 高光阴影色调工具面板。
 ///
-/// 阴影 / 高光强度（0-100）+ 各自色调色板。
+/// 阴影 / 高光强度（0-100）+ 各自色调色板（RN ImageColorBalance 的
+/// `ColorSelector` 色块行）。
 /// 参数结构：
 /// `{'shadowTint': 0..100, 'highlightTint': 0..100,
 ///   'shadowTintColor': int(ARGB), 'highlightTintColor': int(ARGB)}`。
@@ -65,12 +69,20 @@ class _HighlightShadowTintToolViewState
     if (highlight is num) _highlightIntensity = highlight.toDouble();
   }
 
-  int _colorValue(String key, Color fallback) =>
-      (widget.params[key] as int?) ?? fallback.toARGB32();
+  Color _colorValue(String key, List<Color> swatch) =>
+      Color((widget.params[key] as int?) ?? swatch.first.toARGB32());
 
   @override
   Widget build(BuildContext context) {
     const color = Colors.white70;
+    final shadowColor = _colorValue(
+      'shadowTintColor',
+      HighlightShadowTintToolView._shadowSwatch,
+    );
+    final highlightColor = _colorValue(
+      'highlightTintColor',
+      HighlightShadowTintToolView._highlightSwatch,
+    );
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -79,10 +91,7 @@ class _HighlightShadowTintToolViewState
           'shadowTint',
           'shadowTintColor',
           HighlightShadowTintToolView._shadowSwatch,
-          _colorValue(
-            'shadowTintColor',
-            HighlightShadowTintToolView._shadowSwatch.first,
-          ),
+          shadowColor,
           color,
           _shadowIntensity,
           (v) => setState(() => _shadowIntensity = v),
@@ -92,10 +101,7 @@ class _HighlightShadowTintToolViewState
           'highlightTint',
           'highlightTintColor',
           HighlightShadowTintToolView._highlightSwatch,
-          _colorValue(
-            'highlightTintColor',
-            HighlightShadowTintToolView._highlightSwatch.first,
-          ),
+          highlightColor,
           color,
           _highlightIntensity,
           (v) => setState(() => _highlightIntensity = v),
@@ -109,7 +115,7 @@ class _HighlightShadowTintToolViewState
     String intensityKey,
     String colorKey,
     List<Color> swatch,
-    int currentColor,
+    Color currentColor,
     Color textColor,
     double intensity,
     ValueChanged<double> onIntensity,
@@ -117,69 +123,26 @@ class _HighlightShadowTintToolViewState
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 88,
-                child: Text(
-                  label,
-                  style: TextStyle(color: textColor, fontSize: 13),
-                ),
-              ),
-              Expanded(
-                child: Slider(
-                  value: intensity.clamp(0, 100),
-                  min: 0,
-                  max: 100,
-                  divisions: 200,
-                  onChanged: (v) {
-                    onIntensity(v);
-                    widget.onChanged({...widget.params, intensityKey: v});
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 44,
-                child: Text(
-                  intensity.toStringAsFixed(0),
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: textColor.withValues(alpha: 0.7),
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        EditSlider(
+          label: label,
+          value: intensity.clamp(0, 100),
+          min: 0,
+          max: 100,
+          divisions: 200,
+          textColor: textColor,
+          onChanged: (v) {
+            onIntensity(v);
+            widget.onChanged({...widget.params, intensityKey: v});
+          },
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (final c in swatch)
-                GestureDetector(
-                  onTap: () => widget
-                      .onChanged({...widget.params, colorKey: c.toARGB32()}),
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      color: c,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: c.toARGB32() == currentColor
-                            ? Colors.white
-                            : Colors.transparent,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: ColorSelector(
+            colors: swatch,
+            selected: currentColor,
+            showCustom: false,
+            onSelect: (c) =>
+                widget.onChanged({...widget.params, colorKey: c.toARGB32()}),
           ),
         ),
       ],

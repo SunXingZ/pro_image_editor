@@ -99,8 +99,16 @@ class ShaderRenderer {
         samplers[1] = await _curveLut(curve);
         break;
       case ShaderTool.lut:
-        final preset = state.params['preset'] as String? ?? 'identity';
-        samplers[1] = await _lutImage(preset);
+        // 关闭状态：跳过该 pass（与 RN Lut.getUniforms 返回 null 一致）。
+        if (state.params['enable'] == false) return null;
+        final data = state.params['data'];
+        if (data is List && data.isNotEmpty) {
+          final size = (state.params['size'] as num?)?.toInt() ?? _lutSize;
+          samplers[1] = await _customLutImage(data, size);
+        } else {
+          final preset = state.params['preset'] as String? ?? 'identity';
+          samplers[1] = await _lutImage(preset);
+        }
         break;
       case ShaderTool.selectiveBlur:
       case ShaderTool.tiltShiftBlur:
@@ -144,11 +152,21 @@ class ShaderRenderer {
   static String? textureKeyFor(ShaderFilterState state) =>
       switch (state.tool) {
         ShaderTool.toneCurve => state.params['curve']?.toString(),
-        ShaderTool.lut => state.params['preset'] as String?,
+        ShaderTool.lut => _lutTextureKey(state.params),
         ShaderTool.selectiveBlur || ShaderTool.tiltShiftBlur =>
           (state.params['intensity'] as num?)?.round().toString(),
         _ => null,
       };
+
+  /// LUT 纹理键：自定义文件按 尺寸+内容哈希，预设按预设名。
+  static String? _lutTextureKey(Map<String, dynamic> params) {
+    final data = params['data'];
+    if (data is List && data.isNotEmpty) {
+      final size = (params['size'] as num?)?.toInt() ?? _lutSize;
+      return 'custom:$size:${Object.hashAll(data)}';
+    }
+    return params['preset'] as String?;
+  }
 
   Future<ui.FragmentProgram> _loadProgram(String asset) =>
       ui.FragmentProgram.fromAsset(asset);
@@ -226,6 +244,40 @@ class ShaderRenderer {
         pixels[idx + 2] = (out[2] * 255).round();
         pixels[idx + 3] = 255;
       }
+    }
+    return _decodeRgba(pixels, w, h);
+  }
+
+  /// 生成文件解析出的自定义 3D LUT 纹理（宽 = size*size，高 = size）。
+  ///
+  /// 像素布局与 RN `createImageByLut` 一致：按数据序号 i 映射到
+  /// (startY = (i/size)%size, startX = i%size + size*((i/size)/size))。
+  Future<ui.Image> _customLutImage(List<dynamic> data, int size) async {
+    final key = 'custom:$size:${Object.hashAll(data)}';
+    final cached = _lutImageCache[key];
+    if (cached != null) return cached;
+    final future = _buildCustomLutImage(data, size);
+    _lutImageCache[key] = future;
+    return future;
+  }
+
+  Future<ui.Image> _buildCustomLutImage(List<dynamic> data, int size) async {
+    final w = size * size;
+    final h = size;
+    final pixels = Uint8List(w * h * 4);
+    final count = size * size * size;
+    for (var i = 0; i < count; i++) {
+      final startY = (i ~/ size) % size;
+      final startX = i % size + size * ((i ~/ size) ~/ size);
+      final src = i * 3;
+      final r = (data[src] as num).clamp(0.0, 1.0);
+      final g = (data[src + 1] as num).clamp(0.0, 1.0);
+      final b = (data[src + 2] as num).clamp(0.0, 1.0);
+      final idx = (startY * w + startX) * 4;
+      pixels[idx] = (r * 255).round();
+      pixels[idx + 1] = (g * 255).round();
+      pixels[idx + 2] = (b * 255).round();
+      pixels[idx + 3] = 255;
     }
     return _decodeRgba(pixels, w, h);
   }
@@ -536,8 +588,9 @@ class ShaderRenderer {
 
       case ShaderTool.lut:
         // lut.frag: lutSize(2) intensity(3)
-        setFloat(2, _lutSize.toDouble());
-        setFloat(3, ((p['intensity'] as num?)?.toDouble() ?? 100) / 100);
+        final size = (p['size'] as num?)?.toInt() ?? _lutSize;
+        setFloat(2, size.toDouble());
+        setFloat(3, ((p['intensity']) ?? 100) / 100);
         break;
 
       case ShaderTool.selectiveBlur:

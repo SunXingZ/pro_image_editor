@@ -156,19 +156,26 @@ class _ShaderFilteredWidgetState extends State<ShaderFilteredWidget> {
     });
   }
 
-  /// 计算当前（考虑视频时间轴后）应生效的效果。
+  /// 计算当前（考虑视频时间轴与启用开关后）应生效的效果。
   ///
-  /// 时间轴模式下 shader 参数无法线性插值，仅做显隐切换。
+  /// 时间轴模式下 shader 参数无法线性插值，仅做显隐切换；
+  /// `params['enable'] == false` 的效果（如 LUT 的启用开关）在渲染时跳过，
+  /// 无需重新准备 pass。
   List<ShaderFilterState> _effectiveStates() {
     final playTime = widget.playTimeNotifier?.value;
-    if (playTime == null) return widget.shaderFilters;
-    return widget.shaderFilters.where((state) {
-      final start = state.startTime ?? Duration.zero;
-      final end = state.endTime;
-      if (playTime < start) return false;
-      if (end != null && !(playTime < end)) return false;
-      return true;
-    }).toList();
+    Iterable<ShaderFilterState> states = widget.shaderFilters;
+    if (playTime != null) {
+      states = states.where((state) {
+        final start = state.startTime ?? Duration.zero;
+        final end = state.endTime;
+        if (playTime < start) return false;
+        if (end != null && !(playTime < end)) return false;
+        return true;
+      });
+    }
+    return states
+        .where((state) => state.params['enable'] != false)
+        .toList();
   }
 
   @override

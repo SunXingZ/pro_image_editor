@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '/shared/widgets/edit_slider.dart';
 import '../../models/shader_filter_state.dart';
 
 /// 模糊工具底部面板。
@@ -57,7 +58,6 @@ class _BlurToolViewState extends State<BlurToolView> {
 
   @override
   Widget build(BuildContext context) {
-    const color = Colors.white70;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -105,42 +105,17 @@ class _BlurToolViewState extends State<BlurToolView> {
           ),
         ),
         // 强度
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Row(
-            children: [
-              const SizedBox(
-                width: 88,
-                child: Text(
-                  'Intensity',
-                  style: TextStyle(color: color, fontSize: 13),
-                ),
-              ),
-              Expanded(
-                child: Slider(
-                  value: _intensity.clamp(0, 30),
-                  min: 0,
-                  max: 30,
-                  divisions: 300,
-                  onChanged: (v) {
-                    setState(() => _intensity = v);
-                    _emit();
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 44,
-                child: Text(
-                  (_intensity * 100 / 30).round().toString(),
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: color.withValues(alpha: 0.7),
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        EditSlider(
+          label: 'Intensity',
+          value: _intensity.clamp(0, 30),
+          min: 0,
+          max: 30,
+          divisions: 300,
+          valueText: (_intensity * 100 / 30).round().toString(),
+          onChanged: (v) {
+            setState(() => _intensity = v);
+            _emit();
+          },
         ),
       ],
     );

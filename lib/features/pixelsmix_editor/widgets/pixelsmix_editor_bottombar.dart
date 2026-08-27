@@ -1,3 +1,7 @@
+// Flutter imports:
+import 'dart:ui' as ui;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '/core/models/editor_configs/pixelsmix_editor_configs.dart';
@@ -9,6 +13,7 @@ import 'tools/color_balance_tool_view.dart';
 import 'tools/color_matrix_tool_view.dart';
 import 'tools/curve_tool_view.dart';
 import 'tools/highlight_shadow_tint_tool_view.dart';
+import 'tools/hsl_band_colors.dart';
 import 'tools/hsl_tool_view.dart';
 import 'tools/lut_tool_view.dart';
 import 'tools/restorable_curve_panel.dart';
@@ -30,6 +35,7 @@ class PixelsmixEditorBottombar extends StatelessWidget {
     this.current,
     this.onShaderStateChanged,
     this.curveController,
+    this.previewSource,
   });
 
   /// Pixelsmix 编辑器配置。
@@ -46,6 +52,9 @@ class PixelsmixEditorBottombar extends StatelessWidget {
 
   /// 参数变化回调。
   final ValueChanged<Map<String, dynamic>> onChanged;
+
+  /// 源图就绪通知器（供颜色矩阵预设展示当前图片缩略图）。
+  final ValueListenable<ui.Image?>? previewSource;
 
   /// 当前生效的完整效果状态（模糊工具需要）。
   final ShaderFilterState? current;
@@ -94,10 +103,18 @@ class PixelsmixEditorBottombar extends StatelessWidget {
         );
 
       case ShaderTool.colorMatrix:
-        return ColorMatrixToolView(params: params, onChanged: onChanged);
+        return ColorMatrixToolView(
+          params: params,
+          onChanged: onChanged,
+          previewSource: previewSource,
+        );
 
       case ShaderTool.lut:
-        return LutToolView(params: params, onChanged: onChanged);
+        return LutToolView(
+          params: params,
+          onChanged: onChanged,
+          onPickLut: configs.lutFilePicker,
+        );
 
       case ShaderTool.selectiveBlur:
       case ShaderTool.tiltShiftBlur:
@@ -115,7 +132,14 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           onChanged: onChanged,
           textColor: textColor,
           items: const [
-            SliderToolItem(key: 'vibrance', label: 'Vibrance', initial: 50),
+            // RN ImageColors Vibrance：HSL 色带渐变轨道 + 中点吸附
+            SliderToolItem(
+              key: 'vibrance',
+              label: 'Vibrance',
+              initial: 50,
+              snapToMiddle: true,
+              trackColors: kHslBandColors,
+            ),
           ],
         );
 
@@ -133,8 +157,17 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           onChanged: onChanged,
           textColor: textColor,
           items: const [
-            SliderToolItem(key: 'shadows', label: 'Shadows'),
-            SliderToolItem(key: 'highlights', label: 'Highlights'),
+            // RN ImageColors Tone：阴影 灰→白、高光 白→灰 渐变轨道
+            SliderToolItem(
+              key: 'shadows',
+              label: 'Shadows',
+              trackColors: [Color(0xFF4D4D4D), Colors.white],
+            ),
+            SliderToolItem(
+              key: 'highlights',
+              label: 'Highlights',
+              trackColors: [Colors.white, Color(0xFF4D4D4D)],
+            ),
           ],
         );
 
