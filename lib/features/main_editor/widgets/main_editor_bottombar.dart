@@ -291,10 +291,10 @@ class MainEditorBottombar extends StatelessWidget {
                 tool: ShaderTool.vignette,
               );
 
-            case SubEditorMode.pixelsmixColorMatrix:
+            case SubEditorMode.pixelsmixFilter:
               return _buildPixelsmixButton(
-                key: const ValueKey('open-pixelsmix-color-matrix-btn'),
-                tool: ShaderTool.colorMatrix,
+                key: const ValueKey('open-pixelsmix-filter-btn'),
+                tool: ShaderTool.filter,
               );
 
             case SubEditorMode.pixelsmixLut:

@@ -93,8 +93,8 @@ enum SubEditorMode {
   /// The Pixelsmix vignette editor.
   pixelsmixVignette,
 
-  /// The Pixelsmix color-matrix editor.
-  pixelsmixColorMatrix,
+  /// The Pixelsmix filter editor (built-in LUT presets, former color matrix).
+  pixelsmixFilter,
 
   /// The Pixelsmix LUT editor.
   pixelsmixLut,

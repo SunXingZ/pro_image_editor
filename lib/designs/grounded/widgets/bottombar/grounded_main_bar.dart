@@ -277,7 +277,7 @@ class GroundedMainBarState extends State<GroundedMainBar>
           SubEditorMode.pixelsmixSharpen ||
           SubEditorMode.pixelsmixNoise ||
           SubEditorMode.pixelsmixVignette ||
-          SubEditorMode.pixelsmixColorMatrix ||
+          SubEditorMode.pixelsmixFilter ||
           SubEditorMode.pixelsmixLut ||
           SubEditorMode.pixelsmixBlur:
         return _buildPixelsmixButton(tool);

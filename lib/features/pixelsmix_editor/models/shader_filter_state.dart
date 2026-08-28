@@ -37,8 +37,8 @@ enum ShaderTool {
   /// 暗角。
   vignette('vignette'),
 
-  /// 颜色矩阵。
-  colorMatrix('colorMatrix'),
+  /// 滤镜（内置 LUT 预设画廊，替代原颜色矩阵）。
+  filter('filter'),
 
   /// 3D LUT。
   lut('lut'),
@@ -56,6 +56,9 @@ enum ShaderTool {
 
   /// 根据字符串标识反查 [ShaderTool]。
   static ShaderTool? fromId(String id) {
+    // 旧版本历史兼容：颜色矩阵工具已更名为滤镜，旧 id 映射到新工具，
+    // 避免已保存的滤镜在「继续编辑」时丢失（旧 {matrix} 参数渲染时回落为原始图）。
+    if (id == 'colorMatrix') return ShaderTool.filter;
     for (final tool in ShaderTool.values) {
       if (tool.id == id) return tool;
     }
@@ -70,7 +73,7 @@ enum ShaderTool {
 /// 时按此顺序对效果排序，保证任意操作顺序下叠加结果与 RN 一致。
 int shaderToolCompositionOrder(ShaderTool tool) => switch (tool) {
       ShaderTool.lut => 0,
-      ShaderTool.colorMatrix => 1,
+      ShaderTool.filter => 1,
       ShaderTool.selectiveBlur || ShaderTool.tiltShiftBlur => 2,
       ShaderTool.sharpen => 3,
       ShaderTool.vignette => 4,
@@ -106,8 +109,8 @@ int shaderToolCompositionOrder(ShaderTool tool) => switch (tool) {
 ///   单值或双值对象。
 /// - `vignette`:
 ///   `{'center': [x,y], 'color': int, 'start': double, 'end': double}`
-/// - `colorMatrix`:
-///   `{'matrix': [16 doubles, 列主序]}`
+/// - `filter`:
+///   `{'asset': String, 'preset': String, 'size': int, 'intensity': double}`
 /// - `lut`:
 ///   `{'lutTexture': String, 'intensity': double}`
 /// - `selectiveBlur`:

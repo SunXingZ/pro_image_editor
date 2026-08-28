@@ -12,6 +12,7 @@ class I18nPixelsmixEditor {
     this.enable = 'Enable',
     this.selectFile = 'Select file',
     this.lutNotConfigured = 'LUT picker not configured',
+    this.filterOriginal = 'Original',
     this.circular = 'Circular',
     this.linear = 'Linear',
     this.shadows = 'Shadows',
@@ -22,11 +23,6 @@ class I18nPixelsmixEditor {
     this.hue = 'Hue',
     this.saturation = 'Saturation',
     this.lightness = 'Lightness',
-    this.colorMatrixAll = 'All',
-    this.colorMatrixRecommended = 'Recommended',
-    this.colorMatrixWarm = 'Warm',
-    this.colorMatrixCool = 'Cool',
-    this.colorMatrixBw = 'B&W',
     this.resetCurve = 'Reset curve',
     this.toggleGrid = 'Show/Hide grid',
     this.toggleCurveCanvas = 'Show/Hide curve canvas',
@@ -44,7 +40,7 @@ class I18nPixelsmixEditor {
     ShaderTool.sharpen: 'Sharpen',
     ShaderTool.noise: 'Noise',
     ShaderTool.vignette: 'Vignette',
-    ShaderTool.colorMatrix: 'Color Matrix',
+    ShaderTool.filter: 'Filter',
     ShaderTool.lut: 'LUT',
     ShaderTool.selectiveBlur: 'Blur',
     ShaderTool.tiltShiftBlur: 'Blur',
@@ -104,20 +100,8 @@ class I18nPixelsmixEditor {
   /// Label of the lightness channel (HSL tool).
   final String lightness;
 
-  /// Label of the "all" classify (color matrix tool).
-  final String colorMatrixAll;
-
-  /// Label of the "recommended" classify (color matrix tool).
-  final String colorMatrixRecommended;
-
-  /// Label of the "warm" classify (color matrix tool).
-  final String colorMatrixWarm;
-
-  /// Label of the "cool" classify (color matrix tool).
-  final String colorMatrixCool;
-
-  /// Label of the "B&W" classify (color matrix tool).
-  final String colorMatrixBw;
+  /// Label of the "original / no filter" chip in the filter tool.
+  final String filterOriginal;
 
   /// Tooltip of the "reset curve" button.
   final String resetCurve;
@@ -148,11 +132,7 @@ class I18nPixelsmixEditor {
     String? hue,
     String? saturation,
     String? lightness,
-    String? colorMatrixAll,
-    String? colorMatrixRecommended,
-    String? colorMatrixWarm,
-    String? colorMatrixCool,
-    String? colorMatrixBw,
+    String? filterOriginal,
     String? resetCurve,
     String? toggleGrid,
     String? toggleCurveCanvas,
@@ -176,12 +156,7 @@ class I18nPixelsmixEditor {
       hue: hue ?? this.hue,
       saturation: saturation ?? this.saturation,
       lightness: lightness ?? this.lightness,
-      colorMatrixAll: colorMatrixAll ?? this.colorMatrixAll,
-      colorMatrixRecommended:
-          colorMatrixRecommended ?? this.colorMatrixRecommended,
-      colorMatrixWarm: colorMatrixWarm ?? this.colorMatrixWarm,
-      colorMatrixCool: colorMatrixCool ?? this.colorMatrixCool,
-      colorMatrixBw: colorMatrixBw ?? this.colorMatrixBw,
+      filterOriginal: filterOriginal ?? this.filterOriginal,
       resetCurve: resetCurve ?? this.resetCurve,
       toggleGrid: toggleGrid ?? this.toggleGrid,
       toggleCurveCanvas: toggleCurveCanvas ?? this.toggleCurveCanvas,

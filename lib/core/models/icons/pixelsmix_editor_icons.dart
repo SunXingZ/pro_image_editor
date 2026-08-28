@@ -25,8 +25,8 @@ class PixelsmixEditorIcons {
     ShaderTool.sharpen: Icons.highlight,
     ShaderTool.noise: Icons.grain,
     ShaderTool.vignette: Icons.center_focus_strong,
-    ShaderTool.colorMatrix: Icons.grid_on,
-    ShaderTool.lut: Icons.photo_filter,
+    ShaderTool.filter: Icons.photo_filter,
+    ShaderTool.lut: Icons.grid_view,
     ShaderTool.selectiveBlur: Icons.blur_circular,
     ShaderTool.tiltShiftBlur: Icons.blur_linear,
   };

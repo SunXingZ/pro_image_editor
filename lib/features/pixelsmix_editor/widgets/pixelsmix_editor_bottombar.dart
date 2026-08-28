@@ -10,8 +10,8 @@ import '/core/models/i18n/i18n_pixelsmix_editor.dart';
 import '../models/shader_filter_state.dart';
 import 'tools/blur_tool_view.dart';
 import 'tools/color_balance_tool_view.dart';
-import 'tools/color_matrix_tool_view.dart';
 import 'tools/curve_tool_view.dart';
+import 'tools/filter_tool_view.dart';
 import 'tools/highlight_shadow_tint_tool_view.dart';
 import 'tools/hsl_band_colors.dart';
 import 'tools/hsl_tool_view.dart';
@@ -112,11 +112,12 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           i18n: i18n,
         );
 
-      case ShaderTool.colorMatrix:
-        return ColorMatrixToolView(
+      case ShaderTool.filter:
+        return FilterToolView(
           params: params,
           onChanged: onChanged,
           previewSource: previewSource,
+          categories: configs.filterCategories ?? const [],
           i18n: i18n,
         );
 

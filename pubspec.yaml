@@ -90,7 +90,6 @@ flutter:
     - lib/shared/shaders/pixelsmix/sharpen.frag
     - lib/shared/shaders/pixelsmix/noise.frag
     - lib/shared/shaders/pixelsmix/vignette.frag
-    - lib/shared/shaders/pixelsmix/color_matrix.frag
     - lib/shared/shaders/pixelsmix/lut.frag
     - lib/shared/shaders/pixelsmix/selective_blur.frag
     - lib/shared/shaders/pixelsmix/tilt_shift_blur.frag

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_image_filters/flutter_image_filters.dart';
 import 'package:pixelsmix_filters/pixelsmix_filters.dart';
 
@@ -68,7 +69,7 @@ class ShaderRenderer {
         ShaderTool.sharpen => '${kPixelsmixShadersRoot}sharpen.frag',
         ShaderTool.noise => '${kPixelsmixShadersRoot}noise.frag',
         ShaderTool.vignette => '${kPixelsmixShadersRoot}vignette.frag',
-        ShaderTool.colorMatrix => '${kPixelsmixShadersRoot}color_matrix.frag',
+        ShaderTool.filter => '${kPixelsmixShadersRoot}lut.frag',
         ShaderTool.lut => '${kPixelsmixShadersRoot}lut.frag',
         ShaderTool.selectiveBlur =>
           '${kPixelsmixShadersRoot}selective_blur.frag',
@@ -108,6 +109,16 @@ class ShaderRenderer {
         } else {
           final preset = state.params['preset'] as String? ?? 'identity';
           samplers[1] = await _lutImage(preset);
+        }
+        break;
+      case ShaderTool.filter:
+        // 内置 LUT 滤镜：按 asset 加载 PNG 纹理；未指定时回落恒等。
+        if (state.params['enable'] == false) return null;
+        final asset = state.params['asset'];
+        if (asset is String && asset.isNotEmpty) {
+          samplers[1] = await _assetLutImage(asset);
+        } else {
+          samplers[1] = await _lutImage('identity');
         }
         break;
       case ShaderTool.selectiveBlur:
@@ -152,19 +163,21 @@ class ShaderRenderer {
   static String? textureKeyFor(ShaderFilterState state) =>
       switch (state.tool) {
         ShaderTool.toneCurve => state.params['curve']?.toString(),
-        ShaderTool.lut => _lutTextureKey(state.params),
+        ShaderTool.lut || ShaderTool.filter => _lutTextureKey(state.params),
         ShaderTool.selectiveBlur || ShaderTool.tiltShiftBlur =>
           (state.params['intensity'] as num?)?.round().toString(),
         _ => null,
       };
 
-  /// LUT 纹理键：自定义文件按 尺寸+内容哈希，预设按预设名。
+  /// LUT 纹理键：自定义文件按 尺寸+内容哈希，内置滤镜按 asset，预设按预设名。
   static String? _lutTextureKey(Map<String, dynamic> params) {
     final data = params['data'];
     if (data is List && data.isNotEmpty) {
       final size = (params['size'] as num?)?.toInt() ?? _lutSize;
       return 'custom:$size:${Object.hashAll(data)}';
     }
+    final asset = params['asset'];
+    if (asset is String && asset.isNotEmpty) return 'asset:$asset';
     return params['preset'] as String?;
   }
 
@@ -220,10 +233,40 @@ class ShaderRenderer {
     if (cached != null) return cached;
     final future = _buildLutImage(preset);
     _lutImageCache[preset] = future;
+    _trimLutImageCache();
     return future;
   }
 
   static const int _lutSize = 32;
+
+  /// 内置滤镜 PNG 纹理：按 asset 加载并缓存。
+  ///
+  /// 缩略图与预览共用同一份缓存；容量受限（[ShaderRenderer._lutImageCacheLimit]），
+  /// 切换分类时旧条目被淘汰，避免内存随分类累积导致峰值过高。
+  Future<ui.Image> _assetLutImage(String asset) async {
+    final cached = _lutImageCache[asset];
+    if (cached != null) return cached;
+    final future = _loadAssetLut(asset);
+    _lutImageCache[asset] = future;
+    _trimLutImageCache();
+    return future;
+  }
+
+  Future<ui.Image> _loadAssetLut(String asset) async {
+    final data = await rootBundle.load(asset);
+    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+    final frame = await codec.getNextFrame();
+    return frame.image;
+  }
+
+  /// 内置滤镜纹理缓存上限：超过时淘汰最早插入的条目（防止内存无界增长）。
+  static const int _lutImageCacheLimit = 64;
+
+  void _trimLutImageCache() {
+    while (_lutImageCache.length > _lutImageCacheLimit) {
+      _lutImageCache.remove(_lutImageCache.keys.first);
+    }
+  }
 
   Future<ui.Image> _buildLutImage(String preset) async {
     const size = _lutSize;
@@ -258,6 +301,7 @@ class ShaderRenderer {
     if (cached != null) return cached;
     final future = _buildCustomLutImage(data, size);
     _lutImageCache[key] = future;
+    _trimLutImageCache();
     return future;
   }
 
@@ -578,15 +622,7 @@ class ShaderRenderer {
         setFloat(6, 0.0);
         break;
 
-      case ShaderTool.colorMatrix:
-        // color_matrix.frag: mat4(2..17)
-        final m = p['matrix'] as List? ?? _identityMatrix;
-        for (var i = 0; i < 16 && i < m.length; i++) {
-          setFloat(i + 2, (m[i] as num).toDouble());
-        }
-        break;
-
-      case ShaderTool.lut:
+      case ShaderTool.filter || ShaderTool.lut:
         // lut.frag: lutSize(2) intensity(3)
         final size = (p['size'] as num?)?.toInt() ?? _lutSize;
         setFloat(2, size.toDouble());
@@ -641,12 +677,4 @@ class ShaderRenderer {
     }
     return const [0, 0, 0];
   }
-
-  /// 4x4 恒等颜色矩阵（列主序）。
-  static const List<double> _identityMatrix = [
-    1, 0, 0, 0, //
-    0, 1, 0, 0, //
-    0, 0, 1, 0, //
-    0, 0, 0, 1,
-  ];
 }

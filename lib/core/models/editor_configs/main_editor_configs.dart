@@ -52,7 +52,7 @@ class MainEditorConfigs extends ZoomConfigs {
       SubEditorMode.pixelsmixSharpen,
       SubEditorMode.pixelsmixNoise,
       SubEditorMode.pixelsmixVignette,
-      SubEditorMode.pixelsmixColorMatrix,
+      SubEditorMode.pixelsmixFilter,
       SubEditorMode.pixelsmixLut,
       SubEditorMode.pixelsmixBlur,
     ],
