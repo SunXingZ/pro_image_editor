@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '/core/models/editor_configs/pixelsmix_editor_configs.dart';
 import '/core/models/i18n/i18n_pixelsmix_editor.dart';
+import '/core/models/i18n/i18n_tune_editor.dart';
 
 import '../models/shader_filter_state.dart';
 import 'tools/blur_tool_view.dart';
@@ -18,6 +19,7 @@ import 'tools/hsl_tool_view.dart';
 import 'tools/lut_tool_view.dart';
 import 'tools/restorable_curve_panel.dart';
 import 'tools/slider_tool_view.dart';
+import 'tools/tune_tool_view.dart';
 
 /// Pixelsmix 编辑器的底部工具条。
 ///
@@ -36,6 +38,10 @@ class PixelsmixEditorBottombar extends StatelessWidget {
     this.onShaderStateChanged,
     this.curveController,
     this.previewSource,
+    this.tuneI18n,
+    this.floating = false,
+    this.initialTuneParam,
+    this.hideTuneParamBar = false,
   });
 
   /// Pixelsmix 编辑器配置。
@@ -43,6 +49,9 @@ class PixelsmixEditorBottombar extends StatelessWidget {
 
   /// 本地化文案。
   final I18nPixelsmixEditor i18n;
+
+  /// 基础调节（tune）工具的本地化文案（缺省回退英文）。
+  final I18nTuneEditor? tuneI18n;
 
   /// 当前工具。
   final ShaderTool tool;
@@ -65,24 +74,83 @@ class PixelsmixEditorBottombar extends StatelessWidget {
   /// 曲线画布 / 操作区的共享控制器（toneCurve 工具使用）。
   final CurveEditorController? curveController;
 
+  /// 是否悬浮在预览图上层（多工具模式）：半透明磨砂圆角面板；
+  /// 曲线工具的画布脱离面板直接叠在预览图上，磨砂只包操作区。
+  final bool floating;
+
+  /// 参数级平铺模式下当前聚焦的基础调节参数（如 `brightness`）。
+  final String? initialTuneParam;
+
+  /// 参数级平铺模式下隐藏基础调节内置参数条（由底部 tab 栏承担选择）。
+  final bool hideTuneParamBar;
+
   @override
   Widget build(BuildContext context) {
     final textColor = configs.style.bottomBarInactiveItemColor;
+    // 曲线悬浮：画布自带半透明底，直接叠在预览图上（不进磨砂面板），
+    // 磨砂只包住下方操作区。其余路径才构建常规内容，避免无效双重构建。
+    if (floating && tool == ShaderTool.toneCurve) {
+      final curve = CurveToolView(
+        params: params,
+        onChanged: onChanged,
+        curveHeight: 220,
+        controller: curveController!,
+        i18n: i18n,
+      );
+      return ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 340),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            curve.buildCanvas(),
+            const SizedBox(height: 8),
+            _frosted(curve.buildControls()),
+          ],
+        ),
+      );
+    }
+    final content = ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 340),
+      child: SingleChildScrollView(
+        child: _buildToolView(textColor),
+      ),
+    );
+    if (floating) return _frosted(content);
     return Container(
       color: configs.style.bottomBarBackground,
       padding: const EdgeInsets.only(top: 5),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 340),
-        child: SingleChildScrollView(
-          child: _buildToolView(textColor),
-        ),
-      ),
+      child: content,
     );
   }
 
+  /// 半透明磨砂悬浮面板：预览图被覆盖区域透出可见。
+  Widget _frosted(Widget child) => ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Material(
+            color: configs.style.bottomBarBackground.withValues(alpha: 0.55),
+            child: child,
+          ),
+        ),
+      );
+
   Widget _buildToolView(Color textColor) {
     switch (tool) {
+      case ShaderTool.tune:
+        return TuneToolView(
+          params: params,
+          onChanged: onChanged,
+          i18n: tuneI18n ?? const I18nTuneEditor(),
+          textColor: textColor,
+          activeColor: configs.style.bottomBarActiveItemColor,
+          initialParamId: initialTuneParam,
+          hideParamBar: hideTuneParamBar,
+        );
+
       case ShaderTool.toneCurve:
+        // 底部栏模式：仅操作区（画布由编辑器悬浮渲染）；
+        // 悬浮模式在 build 中单独处理（画布脱离磨砂面板）。
         return CurveToolView(
           params: params,
           onChanged: onChanged,

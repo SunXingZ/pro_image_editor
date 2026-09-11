@@ -30,6 +30,7 @@ class I18nPixelsmixEditor {
 
   /// 各工具的显示名称（底部入口与编辑页标题共用）。
   static const Map<ShaderTool, String> _defaultToolLabels = {
+    ShaderTool.tune: 'Tune',
     ShaderTool.toneCurve: 'Curve',
     ShaderTool.hslMix: 'HSL',
     ShaderTool.colorBalance: 'Color Balance',

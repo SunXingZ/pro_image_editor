@@ -7,6 +7,9 @@ import '/shared/utils/parser/curve_parser.dart';
 ///
 /// 每个枚举值对应一个独立的底部工具栏入口与独立编辑页。
 enum ShaderTool {
+  /// 基础调节（亮度/对比度/饱和度/曝光/色相/色温/色调/褪色，4×5 颜色矩阵）。
+  tune('tune'),
+
   /// 色调曲线（4 通道 RGB/R/G/B 控制点）。
   toneCurve('toneCurve'),
 
@@ -73,7 +76,8 @@ enum ShaderTool {
 /// 时按此顺序对效果排序，保证任意操作顺序下叠加结果与 RN 一致。
 int shaderToolCompositionOrder(ShaderTool tool) => switch (tool) {
       ShaderTool.lut => 0,
-      ShaderTool.filter => 1,
+      // tune 与 filter 在 RN 中是同一个颜色矩阵阶段（矩阵相乘合成），并列第 1 步
+      ShaderTool.filter || ShaderTool.tune => 1,
       ShaderTool.selectiveBlur || ShaderTool.tiltShiftBlur => 2,
       ShaderTool.sharpen => 3,
       ShaderTool.vignette => 4,

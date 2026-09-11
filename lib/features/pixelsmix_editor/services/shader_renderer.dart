@@ -8,6 +8,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_image_filters/flutter_image_filters.dart';
 import 'package:pixelsmix_filters/pixelsmix_filters.dart';
 
+import '/features/filter_editor/utils/combine_color_matrix_utils.dart';
+import '/features/filter_editor/utils/filter_generator/filter_addons.dart';
 import '../models/shader_filter_state.dart';
 
 /// 本项目内 pixelsmix shader 资源的包前缀路径。
@@ -56,6 +58,7 @@ class ShaderRenderer {
 
   /// 各工具对应的 shader 资源路径。
   String _assetFor(ShaderTool tool) => switch (tool) {
+        ShaderTool.tune => '${kPixelsmixShadersRoot}color_matrix.frag',
         ShaderTool.toneCurve => '${kPixelsmixShadersRoot}tone_curve.frag',
         ShaderTool.hslMix => '${kPixelsmixShadersRoot}hsl_mix.frag',
         ShaderTool.colorBalance =>
@@ -494,6 +497,39 @@ class ShaderRenderer {
     return completer.future;
   }
 
+  /// 基础调节 8 个参数（键与 [TuneAdjustmentItem.id] 一致，值为滑杆值）。
+  static const List<String> tuneParamIds = [
+    'brightness',
+    'contrast',
+    'saturation',
+    'exposure',
+    'hue',
+    'temperature',
+    'tint',
+    'fade',
+  ];
+
+  /// 由基础调节参数合成 4×5 颜色矩阵。
+  ///
+  /// 与 [ColorFilterGenerator] 的合成逻辑一致（tune 矩阵依次相乘），
+  /// 保证走 shader 后视觉效果与原颜色矩阵通道完全一致。
+  static List<double> tuneMatrix(Map<String, dynamic> params) {
+    double v(String id) => (params[id] as num?)?.toDouble() ?? 0;
+    return mergeColorMatrices(
+      filterList: const [],
+      tuneAdjustmentList: [
+        ColorFilterAddons.brightness(v('brightness')),
+        ColorFilterAddons.contrast(v('contrast')),
+        ColorFilterAddons.saturation(v('saturation')),
+        ColorFilterAddons.exposure(v('exposure')),
+        ColorFilterAddons.hue(v('hue')),
+        ColorFilterAddons.temperature(v('temperature')),
+        ColorFilterAddons.tint(v('tint')),
+        ColorFilterAddons.fade(v('fade')),
+      ],
+    );
+  }
+
   /// 同步装配 uniforms（须在 [prepare] 之后、绘制前调用）。
   ///
   /// [state] 为装配 uniforms 所依据的最新参数（可与 [ShaderRenderPass.state]
@@ -512,9 +548,24 @@ class ShaderRenderer {
     final p = state.params;
     void setFloat(int i, double v) => shader.setFloat(i, v);
 
+    // 注意：location 0/1（u_size）与采样器 0（u_texture_input）由引擎在
+    // ImageFilter.shader 执行时自动注入（见 ImageFilter.shader 文档），
+    // Dart 侧不得覆盖。工具 uniform 从 location 2 开始。
     switch (pass.state.tool) {
+      case ShaderTool.tune:
+        // color_matrix.frag: 20 个矩阵分量（location 2..21）。
+        // ColorFilterAddons 的矩阵按 0..255 值域设计（brightness offset
+        // 基准 100/255、contrast 基准 128 等），而 shader 颜色为 0..1，
+        // 第 5 列偏移分量必须 /255 归一化，否则直接全黑/全白。
+        final tune = tuneMatrix(p);
+        for (var i = 0; i < 20; i++) {
+          final v = i % 5 == 4 ? tune[i] / 255 : tune[i];
+          setFloat(i + 2, v);
+        }
+        break;
+
       case ShaderTool.toneCurve:
-        // tone_curve.frag: u_size(0) 由引擎自动设置为纹理尺寸
+        // tone_curve.frag: 曲线参数走 LUT 纹理，无 float uniform 需更新
         break;
 
       case ShaderTool.hslMix:

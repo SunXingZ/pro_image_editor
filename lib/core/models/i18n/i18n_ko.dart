@@ -126,6 +126,7 @@ I18n buildKoI18n() {
     ),
     pixelsmixEditor: I18nPixelsmixEditor(
       toolLabels: {
+        ShaderTool.tune: '기본 조정',
         ShaderTool.toneCurve: '커브',
         ShaderTool.hslMix: 'HSL',
         ShaderTool.colorBalance: '색상 균형',

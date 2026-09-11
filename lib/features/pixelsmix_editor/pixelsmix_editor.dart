@@ -172,52 +172,148 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
   /// Stream controller to trigger UI updates on parameter change.
   late final StreamController<void> uiStream;
 
-  /// 当前工具。
+  /// 当前工具（兼容单工具用法）。
   ShaderTool get tool => initConfigs.tool;
+
+  /// 工具组：多工具分组编辑时由 initConfigs 注入；缺省为单工具。
+  late final List<ShaderTool> _tools = initConfigs.tools.isNotEmpty
+      ? initConfigs.tools
+      : [initConfigs.tool];
+
+  /// 当前选中的工具（底部横向 tab）。
+  late ShaderTool _activeTool;
+
+  /// 参数级平铺下当前聚焦的基础调节参数（非 tune 工具时为 null）。
+  String? _activeTuneParam;
+
+  /// 各工具的编辑状态：多工具时各自独立，切换 tab 不丢失。
+  final Map<ShaderTool, ShaderFilterState> _statesByTool = {};
+
+  /// 当前选中工具的编辑状态。
+  ShaderFilterState? get current => _statesByTool[_activeTool];
+
+  /// 是否开启基础调节参数级平铺（调节页：亮度/对比度/…/褪色各占一个 tab）。
+  bool get _expandTuneParams =>
+      initConfigs.expandTuneParams && _tools.length > 1;
+
+  /// 基础调节参数平铺顺序（与 [TuneToolView] 参数顺序一致）。
+  static const List<String> _tuneParamOrder = [
+    'brightness',
+    'contrast',
+    'saturation',
+    'exposure',
+    'hue',
+    'temperature',
+    'tint',
+    'fade',
+  ];
+
+  /// 基础调节参数的 tab 图标（与 TuneEditor 默认图标集一致）。
+  static const Map<String, IconData> _tuneParamIcons = {
+    'brightness': Icons.brightness_4_outlined,
+    'contrast': Icons.contrast,
+    'saturation': Icons.water_drop_outlined,
+    'exposure': Icons.exposure,
+    'hue': Icons.color_lens_outlined,
+    'temperature': Icons.thermostat_outlined,
+    'tint': Icons.tonality_outlined,
+    'fade': Icons.blur_off_outlined,
+  };
+
+  String _tuneParamLabel(String id) {
+    final t = i18n.tuneEditor;
+    return switch (id) {
+      'brightness' => t.brightness,
+      'contrast' => t.contrast,
+      'saturation' => t.saturation,
+      'exposure' => t.exposure,
+      'hue' => t.hue,
+      'temperature' => t.temperature,
+      'tint' => t.tint,
+      'fade' => t.fade,
+      _ => id,
+    };
+  }
+
+  /// 底部 tab 项列表：参数级平铺时 tune 展开为各参数 tab，其余工具各一项。
+  List<_ToolTab> get _toolTabs {
+    final icons = configs.pixelsmixEditor.icons.tools;
+    final toolI18n = i18n.pixelsmixEditor;
+    final tabs = <_ToolTab>[];
+    for (final t in _tools) {
+      if (t == ShaderTool.tune && _expandTuneParams) {
+        for (final id in _tuneParamOrder) {
+          tabs.add(_ToolTab(
+            tool: t,
+            paramKey: id,
+            label: _tuneParamLabel(id),
+            icon: _tuneParamIcons[id],
+          ));
+        }
+      } else {
+        tabs.add(_ToolTab(
+          tool: t,
+          label: toolI18n.toolLabels[t] ?? '',
+          icon: icons[t] ?? Icons.auto_fix_high,
+        ));
+      }
+    }
+    return tabs;
+  }
 
   /// 是否模糊类入口（圆形/线性共用同一个编辑页）。
   bool get _isBlurTool =>
-      tool == ShaderTool.selectiveBlur || tool == ShaderTool.tiltShiftBlur;
+      _activeTool == ShaderTool.selectiveBlur ||
+      _activeTool == ShaderTool.tiltShiftBlur;
+
+  static bool _isBlurLike(ShaderTool t) =>
+      t == ShaderTool.selectiveBlur || t == ShaderTool.tiltShiftBlur;
 
   /// 曲线工具是否使用悬浮面板（覆盖在预览图上层，不占用底部空间）。
   ///
-  /// 仅在未自定义底部栏时生效；若调用方提供了自定义 `bottomBar`，则交由
+  /// 仅单工具且未自定义底部栏时生效；多工具模式统一走
+  /// [_useFloatingToolPanel]，若调用方提供了自定义 `bottomBar`，则交由
   /// 调用方自行渲染，避免出现两个曲线面板。
   bool get _useFloatingCurvePanel =>
-      tool == ShaderTool.toneCurve &&
+      _tools.length <= 1 &&
+      _activeTool == ShaderTool.toneCurve &&
       configs.pixelsmixEditor.widgets.bottomBar == null;
 
-  /// 预览应渲染的效果：其他已应用的 shader 效果 + 当前编辑中的工具。
+  /// 多工具模式：操作面板直接悬浮在预览图上层（半透明磨砂，
+  /// 图片透出可见），图片尺寸恒定不动，底部只留工具 tab 栏。
+  bool get _useFloatingToolPanel =>
+      _tools.length > 1 && configs.pixelsmixEditor.widgets.bottomBar == null;
+
+  /// 预览应渲染的效果：其他已应用的 shader 效果 + 当前组内各工具编辑中的效果。
   ///
   /// 与主编辑器渲染顺序一致（重编辑同工具时在原位替换、保持顺序），
   /// 保证所见即所得，避免保存后效果与预览不一致造成"叠加/强度翻倍"观感。
   List<ShaderFilterState> get _previewShaderFilters {
-    final state = current;
-    final applied = appliedShaderFilters;
-    if (state == null) return applied;
+    final edited = <ShaderTool, ShaderFilterState>{
+      for (final e in _statesByTool.entries) e.key: e.value,
+    };
+    if (edited.isEmpty) return appliedShaderFilters;
     final result = <ShaderFilterState>[];
-    var replaced = false;
-    for (final s in applied) {
-      final matches = _isBlurTool
-          ? (s.tool == ShaderTool.selectiveBlur ||
-              s.tool == ShaderTool.tiltShiftBlur)
-          : s.tool == tool;
-      if (matches) {
-        if (!replaced) {
-          result.add(state);
-          replaced = true;
-        }
-        // 同工具的旧状态跳过，保留原位
-      } else {
+    final inserted = <ShaderTool>{};
+    bool sameGroup(ShaderTool a, ShaderTool b) =>
+        (_isBlurLike(a) && _isBlurLike(b)) || a == b;
+    for (final s in appliedShaderFilters) {
+      final matched = edited.entries
+          .where((e) => sameGroup(e.key, s.tool))
+          .toList();
+      if (matched.isEmpty) {
         result.add(s);
+      } else if (!inserted.contains(matched.first.key)) {
+        // 同工具的旧状态在组内编辑状态处原位替换
+        result.add(matched.first.value);
+        inserted.add(matched.first.key);
       }
     }
-    if (!replaced) result.add(state);
+    for (final e in edited.entries) {
+      if (!inserted.contains(e.key)) result.add(e.value);
+    }
     return result;
   }
-
-  /// 当前生效的 shader 效果。
-  ShaderFilterState? current;
 
   /// 预览解码后的源图（供 done 时预准备模糊纹理等）。
   ui.Image? _previewSource;
@@ -241,16 +337,16 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
     uiStream = StreamController.broadcast();
     uiStream.stream.listen((_) => rebuildController.add(null));
 
-    // 初始化当前参数：优先取已应用的、同工具（模糊类含两种）的最近一条效果。
+    // 初始化各工具参数：优先取已应用的、同工具（模糊类含两种）的最近一条效果。
     for (final state in appliedShaderFilters.reversed) {
-      if (state.tool == tool ||
-          (_isBlurTool &&
-              (state.tool == ShaderTool.selectiveBlur ||
-                  state.tool == ShaderTool.tiltShiftBlur))) {
-        current = state;
-        break;
+      for (final t in _tools) {
+        if ((_isBlurLike(t) && _isBlurLike(state.tool)) || t == state.tool) {
+          _statesByTool.putIfAbsent(t, () => state);
+        }
       }
     }
+    _activeTool = _tools.first;
+    _activeTuneParam = _expandTuneParams ? _tuneParamOrder.first : null;
 
     pixelsmixEditorCallbacks?.onInit?.call();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -281,8 +377,8 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
     final prev = current;
     setState(() {
       // 保留时间轴字段，避免视频编辑时丢失分段/过渡信息。
-      current = ShaderFilterState(
-        tool: tool,
+      _statesByTool[_activeTool] = ShaderFilterState(
+        tool: _activeTool,
         params: params,
         startTime: prev?.startTime,
         endTime: prev?.endTime,
@@ -294,15 +390,16 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
       );
     });
     uiStream.add(null);
-    pixelsmixEditorCallbacks?.handleShaderFilterChange(current!);
+    pixelsmixEditorCallbacks
+        ?.handleShaderFilterChange(_statesByTool[_activeTool]!);
   }
 
   /// 完整状态变化（模糊工具切换类型时工具本身会改变）。
   void onShaderStateChanged(ShaderFilterState state) {
-    final prev = current;
+    final prev = _statesByTool[state.tool];
     setState(() {
       // 保留时间轴字段，避免视频编辑时丢失分段/过渡信息。
-      current = ShaderFilterState(
+      _statesByTool[state.tool] = ShaderFilterState(
         id: state.id,
         tool: state.tool,
         params: state.params,
@@ -316,7 +413,8 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
       );
     });
     uiStream.add(null);
-    pixelsmixEditorCallbacks?.handleShaderFilterChange(current!);
+    pixelsmixEditorCallbacks
+        ?.handleShaderFilterChange(_statesByTool[state.tool]!);
   }
 
   /// 由模糊手势参数生成 [ShaderFilterState]。
@@ -372,10 +470,10 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
     );
   }
 
-  /// 处理"完成"：返回当前效果（无效果时返回 null）。
+  /// 处理"完成"：返回组内所有非空效果（无效果时返回 null）。
   Future<void> done() async {
-    final state = current;
-    if (state != null) {
+    final states = _statesByTool.values.whereType<ShaderFilterState>().toList();
+    for (final state in states) {
       // 预准备当前效果（复用缓存并写入 pass 缓存），确保返回主编辑器前
       // 已就绪，避免主编辑器重建后首帧未滤镜造成的闪屏。
       try {
@@ -386,7 +484,7 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
     }
     doneEditing(
       editorImage: editorImage,
-      returnValue: state == null ? null : [state],
+      returnValue: states.isEmpty ? null : states,
       blur: appliedBlurFactor,
       matrixFilterList: appliedFilters,
       matrixTuneAdjustmentsList: appliedTuneAdjustments
@@ -483,21 +581,33 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
                 this,
                 rebuildController.stream,
               ),
-            // 曲线工具：面板悬浮在预览图上层，不占用底部空间。
+            // 单工具曲线：画布悬浮；多工具：整块操作面板悬浮。
             if (_useFloatingCurvePanel) _buildFloatingCurvePanel(),
+            if (_useFloatingToolPanel) _buildFloatingToolPanel(),
           ],
         );
       },
     );
   }
 
-  /// 悬浮在预览图上层的曲线画布。
+  /// 悬浮在预览图上层曲线画布（单工具模式）。
   Widget _buildFloatingCurvePanel() {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: _buildCurveToolView().buildCanvas(),
+      ),
+    );
+  }
+
+  /// 悬浮在预览图上层的完整操作面板（多工具模式）。
+  Widget _buildFloatingToolPanel() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+        child: _buildToolbar(floating: true),
       ),
     );
   }
@@ -579,6 +689,24 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
     );
   }
 
+  /// 构建当前工具的操作面板（悬浮 / 底部栏两种形态复用）。
+  Widget _buildToolbar({bool floating = false}) => PixelsmixEditorBottombar(
+        configs: configs.pixelsmixEditor,
+        i18n: i18n.pixelsmixEditor,
+        tool: _activeTool,
+        params: current?.params ?? const {},
+        onChanged: onChanged,
+        current: current,
+        onShaderStateChanged: onShaderStateChanged,
+        curveController:
+            _activeTool == ShaderTool.toneCurve ? _curveEditorController : null,
+        previewSource: previewSourceNotifier,
+        tuneI18n: i18n.tuneEditor,
+        floating: floating,
+        initialTuneParam: _activeTuneParam,
+        hideTuneParamBar: _expandTuneParams,
+      );
+
   Widget? _buildBottomNavBar() {
     if (configs.pixelsmixEditor.widgets.bottomBar != null) {
       return configs.pixelsmixEditor.widgets.bottomBar!.call(
@@ -586,18 +714,47 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
         rebuildController.stream,
       );
     }
-    return PixelsmixEditorBottombar(
-      configs: configs.pixelsmixEditor,
-      i18n: i18n.pixelsmixEditor,
-      tool: tool,
-      params: current?.params ?? const {},
-      onChanged: onChanged,
-      current: current,
-      onShaderStateChanged: onShaderStateChanged,
-      curveController:
-          tool == ShaderTool.toneCurve ? _curveEditorController : null,
-      previewSource: previewSourceNotifier,
+    // 多工具：面板悬浮在预览图上层，底部只留固定高度的 tab 栏。
+    if (_tools.length > 1) return _buildToolTabs();
+    return _buildToolbar();
+  }
+
+  /// 多工具模式：底部横向 tab 栏，点击切换当前工具 / 参数（状态各自独立）。
+  Widget _buildToolTabs() {
+    final style = configs.pixelsmixEditor.style;
+    return Container(
+      color: style.bottomBarBackground,
+      height: kBottomNavigationBarHeight,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final tab in _toolTabs)
+              _PixelTab(
+                icon: tab.icon,
+                label: tab.label,
+                active: tab.tool == _activeTool &&
+                    tab.paramKey == _activeTuneParam,
+                activeColor: style.bottomBarActiveItemColor,
+                inactiveColor: style.bottomBarInactiveItemColor,
+                onTap: () => _switchTool(tab),
+              ),
+          ],
+        ),
+      ),
     );
+  }
+
+  void _switchTool(_ToolTab tab) {
+    final sameTool = tab.tool == _activeTool;
+    final sameParam = tab.paramKey == _activeTuneParam;
+    if (sameTool && sameParam) return;
+    setState(() {
+      _activeTool = tab.tool;
+      _activeTuneParam = tab.paramKey;
+    });
+    uiStream.add(null);
   }
 
   @override
@@ -609,4 +766,69 @@ class PixelsmixEditorState extends State<PixelsmixEditor>
         DiagnosticsProperty<ShaderFilterState?>('current', current),
       );
   }
+}
+
+/// 多工具模式下底部横向 tab 项（图标 + 文案，激活态高亮）。
+class _PixelTab extends StatelessWidget {
+  const _PixelTab({
+    required this.icon,
+    required this.label,
+    required this.active,
+    required this.activeColor,
+    required this.inactiveColor,
+    required this.onTap,
+  });
+
+  final IconData? icon;
+  final String label;
+  final bool active;
+  final Color activeColor;
+  final Color inactiveColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = active ? activeColor : inactiveColor;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 22, color: color),
+              const SizedBox(height: 4),
+            ],
+            Text(
+              label,
+              style: TextStyle(fontSize: 11, color: color),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 底部 tab 项：参数级平铺时 tune 参数 tab 携带 [paramKey]，其余工具为 null。
+class _ToolTab {
+  const _ToolTab({
+    required this.tool,
+    required this.label,
+    this.paramKey,
+    this.icon,
+  });
+
+  /// 对应工具。
+  final ShaderTool tool;
+
+  /// 参数级平铺时携带的参数键（tune 参数级 tab）；工具级 tab 为 null。
+  final String? paramKey;
+
+  /// tab 文案。
+  final String label;
+
+  /// tab 图标（tune 参数级 tab 使用参数专属图标）。
+  final IconData? icon;
 }

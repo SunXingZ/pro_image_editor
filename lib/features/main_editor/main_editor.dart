@@ -2308,7 +2308,13 @@ class ProImageEditorState extends State<ProImageEditor>
   ///
   /// 打开指定 Pixelsmix 工具的独立编辑页。若产生了效果，则将其加入历史，
   /// 从而支持撤销/重做；取消或无效果时保持当前状态不变。
-  void openPixelsmixEditor(ShaderTool tool) async {
+  void openPixelsmixEditor(
+    ShaderTool tool, {
+    // 工具组（分组编辑时传入，底部渲染横向 tab）；为空即单工具。
+    List<ShaderTool> tools = const [],
+    // 参数级平铺：把基础调节展开为参数级 tab（亮度/对比度/…/褪色各一项）。
+    bool expandTuneParams = false,
+  }) async {
     if (!mounted) return;
     List<ShaderFilterState>? shaderFilters = await openPage(
       HeroMode(
@@ -2332,6 +2338,8 @@ class ProImageEditorState extends State<ProImageEditor>
             appliedFilters: stateManager.activeFilters.allMatrices,
             appliedTuneAdjustments: stateManager.activeTuneAdjustments,
             tool: tool,
+            tools: tools,
+            expandTuneParams: expandTuneParams,
             appliedShaderFilters: stateManager.activeShaderFilters,
           ),
         ),
@@ -2364,6 +2372,8 @@ class ProImageEditorState extends State<ProImageEditor>
 
     addHistory(
       shaderFilters: merged,
+      // 基础调节已改由 shader 承载：清掉旧的颜色矩阵 tune，避免双份叠加
+      tuneAdjustments: tools.contains(ShaderTool.tune) ? const [] : null,
       heroScreenshotRequired: true,
     );
 

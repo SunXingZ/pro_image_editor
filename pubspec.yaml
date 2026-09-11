@@ -80,6 +80,7 @@ flutter:
       platforms: [web]
   shaders:
     - lib/shared/shaders/pixelate.frag
+    - lib/shared/shaders/pixelsmix/color_matrix.frag
     - lib/shared/shaders/pixelsmix/tone_curve.frag
     - lib/shared/shaders/pixelsmix/hsl_mix.frag
     - lib/shared/shaders/pixelsmix/color_balance.frag

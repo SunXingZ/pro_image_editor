@@ -126,6 +126,7 @@ I18n buildViI18n() {
     ),
     pixelsmixEditor: I18nPixelsmixEditor(
       toolLabels: {
+        ShaderTool.tune: 'Chỉnh sửa cơ bản',
         ShaderTool.toneCurve: 'Đường cong',
         ShaderTool.hslMix: 'HSL',
         ShaderTool.colorBalance: 'Cân bằng màu',

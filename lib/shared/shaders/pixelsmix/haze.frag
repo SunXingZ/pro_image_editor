@@ -17,5 +17,7 @@ void main() {
     highp float d = textureCoordinate.y * inputSlope + inputHazeDistance;
     highp vec4 c = texture(u_texture_input, textureCoordinate);
     c = (c - d * color) / (1.0 - d);
-    fragColor = c;
+    // clamp：暗部 c < d 时结果为负，ImageFilter.shader 的输出参与合成时
+    // 负值以未定义方式混合（花屏），必须收敛到 0..1。
+    fragColor = clamp(c, 0.0, 1.0);
 }

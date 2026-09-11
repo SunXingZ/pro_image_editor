@@ -125,6 +125,7 @@ I18n buildZhHkI18n() {
     ),
     pixelsmixEditor: I18nPixelsmixEditor(
       toolLabels: {
+        ShaderTool.tune: '基礎調節',
         ShaderTool.toneCurve: '曲線',
         ShaderTool.hslMix: 'HSL',
         ShaderTool.colorBalance: '色彩平衡',

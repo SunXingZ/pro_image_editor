@@ -135,16 +135,25 @@ class _ShaderFilteredWidgetState extends State<ShaderFilteredWidget> {
     final seq = _prepareSeq;
 
     final passes = <ShaderRenderPass>[];
-    for (final state in _sortedFilters()) {
-      final pass = await ShaderRenderer.instance.prepare(
-        state,
-        source: widget.sourceImage,
-      );
-      if (pass != null) passes.add(pass);
-    }
+    try {
+      for (final state in _sortedFilters()) {
+        // 单个工具准备失败（如 shader asset 未注册）时跳过该 pass，
+        // 不让异常把 _preparing 永久卡在 true、拖死其余所有效果。
+        try {
+          final pass = await ShaderRenderer.instance.prepare(
+            state,
+            source: widget.sourceImage,
+          );
+          if (pass != null) passes.add(pass);
+        } catch (e) {
+          debugPrint('ShaderFilteredWidget: prepare ${state.tool} 失败: $e');
+        }
+      }
 
-    if (!mounted) return;
-    _preparing = false;
+      if (!mounted) return;
+    } finally {
+      _preparing = false;
+    }
     if (seq != _prepareSeq || _prepareQueued) {
       await _prepare();
       return;
