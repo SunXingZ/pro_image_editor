@@ -16,11 +16,11 @@ enum ShaderTool {
   /// HSL 混色（8 色相 × H/S/L）。
   hslMix('hslMix'),
 
-  /// 色彩平衡（阴影 / 中间调 / 高光 RGB 色偏）。
+  /// 色彩平衡（阴影 / 中间调 / 高光 CMY 成对色条）。
   colorBalance('colorBalance'),
 
-  /// 高光阴影色调。
-  highlightShadowTint('highlightShadowTint'),
+  /// 色调分离（阴影 / 中间调 / 高光各配色相 + 饱和度）。
+  toneSeparation('toneSeparation'),
 
   /// 鲜艳度。
   vibrance('vibrance'),
@@ -84,11 +84,10 @@ int shaderToolCompositionOrder(ShaderTool tool) => switch (tool) {
       ShaderTool.highlightShadow => 5,
       ShaderTool.vibrance => 6,
       ShaderTool.haze => 7,
-      ShaderTool.highlightShadowTint => 8,
+      ShaderTool.toneSeparation => 8,
       ShaderTool.noise => 9,
       ShaderTool.hslMix => 10,
-      // RN 交互预览无 colorBalance 节点（其 UI 驱动 highlightShadowTint），
-      // 此处按同类最终调色步骤排在 HSL 之后、ToneCurve 之前。
+      // 色彩平衡属最终调色步骤，排在 HSL 之后、ToneCurve 之前。
       ShaderTool.colorBalance => 11,
       ShaderTool.toneCurve => 12,
     };
@@ -104,13 +103,13 @@ int shaderToolCompositionOrder(ShaderTool tool) => switch (tool) {
 /// - `hslMix`:
 ///   `{'colors': {'red': [h,s,b], 'orange': [...], ...}}`
 /// - `colorBalance`:
-///   `{'shadows': [r,g,b], 'midtones': [r,g,b], 'highlights': [r,g,b],
-///     'preserveLuminosity': bool}`
-/// - `highlightShadowTint`:
-///   `{'shadowTintIntensity': double, 'highlightTintIntensity': double,
-///     'shadowTintColor': int, 'highlightTintColor': int}`
-/// - `vibrance` / `haze` / `highlightShadow` / `sharpen` / `noise`:
-///   单值或双值对象。
+///   `{'shadows': [c,m,y], 'midtones': [c,m,y], 'highlights': [c,m,y],
+///     'preserveLuminosity': bool}`，c/m/y 为 -100~100 成对色条值
+///   （正偏青/品红/黄，负偏红/绿/蓝）。
+/// - `toneSeparation`:
+///   `{'shadows': [hue,sat], 'midtones': [hue,sat], 'highlights': [hue,sat]}`，
+///   hue 0~360 度、sat 0~100。
+/// - `vibrance` / `haze` / `highlightShadow` / `sharpen` / `noise`:  单值或双值对象。
 /// - `vignette`:
 ///   `{'center': [x,y], 'color': int, 'start': double, 'end': double}`
 /// - `filter`:

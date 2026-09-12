@@ -13,12 +13,12 @@ import 'tools/blur_tool_view.dart';
 import 'tools/color_balance_tool_view.dart';
 import 'tools/curve_tool_view.dart';
 import 'tools/filter_tool_view.dart';
-import 'tools/highlight_shadow_tint_tool_view.dart';
 import 'tools/hsl_band_colors.dart';
 import 'tools/hsl_tool_view.dart';
 import 'tools/lut_tool_view.dart';
 import 'tools/restorable_curve_panel.dart';
 import 'tools/slider_tool_view.dart';
+import 'tools/tone_separation_tool_view.dart';
 import 'tools/tune_tool_view.dart';
 
 /// Pixelsmix 编辑器的底部工具条。
@@ -173,8 +173,8 @@ class PixelsmixEditorBottombar extends StatelessWidget {
           i18n: i18n,
         );
 
-      case ShaderTool.highlightShadowTint:
-        return HighlightShadowTintToolView(
+      case ShaderTool.toneSeparation:
+        return ToneSeparationToolView(
           params: params,
           onChanged: onChanged,
           i18n: i18n,

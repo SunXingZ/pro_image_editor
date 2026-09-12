@@ -29,11 +29,11 @@ export 'widgets/tools/blur_tool_view.dart';
 export 'widgets/tools/color_balance_tool_view.dart';
 export 'widgets/tools/curve_tool_view.dart';
 export 'widgets/tools/filter_tool_view.dart';
-export 'widgets/tools/highlight_shadow_tint_tool_view.dart';
 export 'widgets/tools/hsl_tool_view.dart';
 export 'widgets/tools/lut_tool_view.dart';
 export 'widgets/tools/restorable_curve_panel.dart';
 export 'widgets/tools/slider_tool_view.dart';
+export 'widgets/tools/tone_separation_tool_view.dart';
 
 /// The `PixelsmixEditor` widget allows users to adjust the current image with
 /// a single Pixelsmix shader tool (tone curve, HSL, color balance, ...).

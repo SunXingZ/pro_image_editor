@@ -270,7 +270,7 @@ class GroundedMainBarState extends State<GroundedMainBar>
       case SubEditorMode.pixelsmixCurve ||
           SubEditorMode.pixelsmixHsl ||
           SubEditorMode.pixelsmixColorBalance ||
-          SubEditorMode.pixelsmixHighlightShadowTint ||
+          SubEditorMode.pixelsmixToneSeparation ||
           SubEditorMode.pixelsmixVibrance ||
           SubEditorMode.pixelsmixHaze ||
           SubEditorMode.pixelsmixHighlightShadow ||

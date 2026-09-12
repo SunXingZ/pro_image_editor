@@ -72,8 +72,8 @@ enum SubEditorMode {
   /// The Pixelsmix color-balance editor.
   pixelsmixColorBalance,
 
-  /// The Pixelsmix highlight/shadow-tint editor.
-  pixelsmixHighlightShadowTint,
+  /// The Pixelsmix tone-separation editor.
+  pixelsmixToneSeparation,
 
   /// The Pixelsmix vibrance editor.
   pixelsmixVibrance,

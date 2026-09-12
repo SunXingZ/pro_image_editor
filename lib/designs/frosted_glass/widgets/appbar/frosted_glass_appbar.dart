@@ -296,7 +296,7 @@ class _FrostedGlassActionBarState extends State<FrostedGlassActionBar> {
             case SubEditorMode.pixelsmixCurve ||
                 SubEditorMode.pixelsmixHsl ||
                 SubEditorMode.pixelsmixColorBalance ||
-                SubEditorMode.pixelsmixHighlightShadowTint ||
+                SubEditorMode.pixelsmixToneSeparation ||
                 SubEditorMode.pixelsmixVibrance ||
                 SubEditorMode.pixelsmixHaze ||
                 SubEditorMode.pixelsmixHighlightShadow ||

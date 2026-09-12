@@ -18,7 +18,7 @@ class PixelsmixEditorIcons {
     ShaderTool.toneCurve: Icons.show_chart,
     ShaderTool.hslMix: Icons.palette_outlined,
     ShaderTool.colorBalance: Icons.tonality,
-    ShaderTool.highlightShadowTint: Icons.gradient,
+    ShaderTool.toneSeparation: Icons.gradient,
     ShaderTool.vibrance: Icons.auto_awesome,
     ShaderTool.haze: Icons.blur_on,
     ShaderTool.highlightShadow: Icons.brightness_6,

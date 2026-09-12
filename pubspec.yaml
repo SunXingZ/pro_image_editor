@@ -84,7 +84,7 @@ flutter:
     - lib/shared/shaders/pixelsmix/tone_curve.frag
     - lib/shared/shaders/pixelsmix/hsl_mix.frag
     - lib/shared/shaders/pixelsmix/color_balance.frag
-    - lib/shared/shaders/pixelsmix/highlight_shadow_tint.frag
+    - lib/shared/shaders/pixelsmix/tone_separation.frag
     - lib/shared/shaders/pixelsmix/vibrance.frag
     - lib/shared/shaders/pixelsmix/haze.frag
     - lib/shared/shaders/pixelsmix/highlight_shadow.frag

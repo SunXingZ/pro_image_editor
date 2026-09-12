@@ -9,8 +9,7 @@ ShaderTool? shaderToolOf(SubEditorMode mode) => switch (mode) {
       SubEditorMode.pixelsmixCurve => ShaderTool.toneCurve,
       SubEditorMode.pixelsmixHsl => ShaderTool.hslMix,
       SubEditorMode.pixelsmixColorBalance => ShaderTool.colorBalance,
-      SubEditorMode.pixelsmixHighlightShadowTint =>
-        ShaderTool.highlightShadowTint,
+      SubEditorMode.pixelsmixToneSeparation => ShaderTool.toneSeparation,
       SubEditorMode.pixelsmixVibrance => ShaderTool.vibrance,
       SubEditorMode.pixelsmixHaze => ShaderTool.haze,
       SubEditorMode.pixelsmixHighlightShadow => ShaderTool.highlightShadow,

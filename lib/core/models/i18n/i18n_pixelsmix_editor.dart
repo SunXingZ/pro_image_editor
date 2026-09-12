@@ -23,6 +23,13 @@ class I18nPixelsmixEditor {
     this.hue = 'Hue',
     this.saturation = 'Saturation',
     this.lightness = 'Lightness',
+    this.cyan = 'Cyan',
+    this.red = 'Red',
+    this.magenta = 'Magenta',
+    this.green = 'Green',
+    this.yellow = 'Yellow',
+    this.blue = 'Blue',
+    this.reset = 'Reset',
     this.resetCurve = 'Reset curve',
     this.toggleGrid = 'Show/Hide grid',
     this.toggleCurveCanvas = 'Show/Hide curve canvas',
@@ -34,7 +41,7 @@ class I18nPixelsmixEditor {
     ShaderTool.toneCurve: 'Curve',
     ShaderTool.hslMix: 'HSL',
     ShaderTool.colorBalance: 'Color Balance',
-    ShaderTool.highlightShadowTint: 'Tint',
+    ShaderTool.toneSeparation: 'Tone Separation',
     ShaderTool.vibrance: 'Vibrance',
     ShaderTool.haze: 'Haze',
     ShaderTool.highlightShadow: 'Highlight',
@@ -101,6 +108,27 @@ class I18nPixelsmixEditor {
   /// Label of the lightness channel (HSL tool).
   final String lightness;
 
+  /// Label of the cyan end (color balance bar).
+  final String cyan;
+
+  /// Label of the red end (color balance bar).
+  final String red;
+
+  /// Label of the magenta end (color balance bar).
+  final String magenta;
+
+  /// Label of the green end (color balance bar).
+  final String green;
+
+  /// Label of the yellow end (color balance bar).
+  final String yellow;
+
+  /// Label of the blue end (color balance bar).
+  final String blue;
+
+  /// Label of the tone-separation swatch-row reset button.
+  final String reset;
+
   /// Label of the "original / no filter" chip in the filter tool.
   final String filterOriginal;
 
@@ -133,6 +161,13 @@ class I18nPixelsmixEditor {
     String? hue,
     String? saturation,
     String? lightness,
+    String? cyan,
+    String? red,
+    String? magenta,
+    String? green,
+    String? yellow,
+    String? blue,
+    String? reset,
     String? filterOriginal,
     String? resetCurve,
     String? toggleGrid,
@@ -157,6 +192,13 @@ class I18nPixelsmixEditor {
       hue: hue ?? this.hue,
       saturation: saturation ?? this.saturation,
       lightness: lightness ?? this.lightness,
+      cyan: cyan ?? this.cyan,
+      red: red ?? this.red,
+      magenta: magenta ?? this.magenta,
+      green: green ?? this.green,
+      yellow: yellow ?? this.yellow,
+      blue: blue ?? this.blue,
+      reset: reset ?? this.reset,
       filterOriginal: filterOriginal ?? this.filterOriginal,
       resetCurve: resetCurve ?? this.resetCurve,
       toggleGrid: toggleGrid ?? this.toggleGrid,

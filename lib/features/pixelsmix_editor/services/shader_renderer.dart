@@ -63,8 +63,8 @@ class ShaderRenderer {
         ShaderTool.hslMix => '${kPixelsmixShadersRoot}hsl_mix.frag',
         ShaderTool.colorBalance =>
           '${kPixelsmixShadersRoot}color_balance.frag',
-        ShaderTool.highlightShadowTint =>
-          '${kPixelsmixShadersRoot}highlight_shadow_tint.frag',
+        ShaderTool.toneSeparation =>
+          '${kPixelsmixShadersRoot}tone_separation.frag',
         ShaderTool.vibrance => '${kPixelsmixShadersRoot}vibrance.frag',
         ShaderTool.haze => '${kPixelsmixShadersRoot}haze.frag',
         ShaderTool.highlightShadow =>
@@ -597,35 +597,29 @@ class ShaderRenderer {
         break;
 
       case ShaderTool.colorBalance:
-        // color_balance.frag: shadows(2) midtones(5) highlights(8)
-        // preserveLuminosity(11)
+        // color_balance.frag（CIELab 感知空间实现）:
+        // shadows(2) midtones(5) highlights(8) preserveLuminosity(11)
+        // 参数为 CMY 成对色条值（-100~100），归一化后由 shader 内部
+        // 转换为 Lab a/b 轴偏移 —— 亮度严格不变，无荧光色。
         final bands = ['shadows', 'midtones', 'highlights'];
         for (var band = 0; band < bands.length; band++) {
-          final rgb = _rgbList(p[bands[band]]);
+          final cmy = _cmyList(p[bands[band]]);
           for (var c = 0; c < 3; c++) {
-            setFloat(band * 3 + c + 2, rgb[c]);
+            setFloat(band * 3 + c + 2, cmy[c]);
           }
         }
         setFloat(11, (p['preserveLuminosity'] as bool? ?? true) ? 1.0 : 0.0);
         break;
 
-      case ShaderTool.highlightShadowTint:
-        // highlight_shadow_tint.frag: intensity(2,3) colors(4,7)
-        setFloat(2, ((p['shadowTint'] as num?)?.toDouble() ?? 0) / 100 * 0.2);
-        setFloat(
-          3,
-          ((p['highlightTint'] as num?)?.toDouble() ?? 0) / 100 * 0.2,
-        );
-        _setColor(
-          setFloat,
-          4,
-          Color((p['shadowTintColor'] as int?) ?? 0xFF000000),
-        );
-        _setColor(
-          setFloat,
-          7,
-          Color((p['highlightTintColor'] as int?) ?? 0xFF000000),
-        );
+      case ShaderTool.toneSeparation:
+        // tone_separation.frag: shadows(2,3) midtones(4,5) highlights(6,7)
+        // 色相 0~360° → 0~1，饱和度 0~100 → 0~1。
+        final bands = ['shadows', 'midtones', 'highlights'];
+        for (var band = 0; band < bands.length; band++) {
+          final hs = _hueSatList(p[bands[band]]);
+          setFloat(band * 2 + 2, hs[0]);
+          setFloat(band * 2 + 3, hs[1]);
+        }
         break;
 
       case ShaderTool.vibrance:
@@ -708,24 +702,29 @@ class ShaderRenderer {
     }
   }
 
-  static void _setColor(
-    void Function(int index, double value) setFloat,
-    int location,
-    Color color,
-  ) {
-    setFloat(location, color.r);
-    setFloat(location + 1, color.g);
-    setFloat(location + 2, color.b);
-  }
-
-  static List<double> _rgbList(dynamic value) {
-    if (value is List) {
-      final rgb = <double>[];
-      for (var i = 0; i < 3; i++) {
-        rgb.add((value[i] as num).toDouble());
-      }
-      return rgb;
+  /// CMY 成对色条值（-100~100，正偏青/品红/黄，负偏红/绿/蓝）归一化为
+  /// [-1,1] 传给 color_balance.frag；shader 内部在 CIELab 感知空间做
+  /// a/b 轴偏移（亮度不变、无荧光色），与 MIX / Photoshop 观感一致。
+  static List<double> _cmyList(dynamic value) {
+    if (value is List && value.length >= 3) {
+      return [
+        (value[0] as num).toDouble() / 100,
+        (value[1] as num).toDouble() / 100,
+        (value[2] as num).toDouble() / 100,
+      ];
     }
     return const [0, 0, 0];
+  }
+
+  /// 提取 [value]（[hueDegrees, saturationPercent]）为归一化后的
+  /// [hue0to1, saturation0to1]；缺省返回无色相、零饱和度。
+  static List<double> _hueSatList(dynamic value) {
+    if (value is List && value.length >= 2) {
+      return [
+        ((value[0] as num).toDouble() / 360).clamp(0.0, 1.0),
+        ((value[1] as num).toDouble() / 100).clamp(0.0, 1.0),
+      ];
+    }
+    return const [0, 0];
   }
 }

@@ -249,10 +249,10 @@ class MainEditorBottombar extends StatelessWidget {
                 tool: ShaderTool.colorBalance,
               );
 
-            case SubEditorMode.pixelsmixHighlightShadowTint:
+            case SubEditorMode.pixelsmixToneSeparation:
               return _buildPixelsmixButton(
-                key: const ValueKey('open-pixelsmix-tint-btn'),
-                tool: ShaderTool.highlightShadowTint,
+                key: const ValueKey('open-pixelsmix-tone-separation-btn'),
+                tool: ShaderTool.toneSeparation,
               );
 
             case SubEditorMode.pixelsmixVibrance:
